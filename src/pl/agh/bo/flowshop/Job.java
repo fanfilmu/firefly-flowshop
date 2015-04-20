@@ -13,6 +13,10 @@ public class Job {
         this.operationTimes = operationTimes;
     }
 
+    public Integer[] getOperationTimes() {
+        return operationTimes;
+    }
+
     public String toString() {
         StringBuilder sb = new StringBuilder("ID: " + id  + ", operations: ");
 
