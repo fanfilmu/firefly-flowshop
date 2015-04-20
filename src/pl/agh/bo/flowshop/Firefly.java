@@ -1,4 +1,6 @@
-    package pl.agh.bo.flowshop;
+package pl.agh.bo.flowshop;
+
+import pl.agh.bo.flowshop.algorithm.HammingDistance;
 
 /**
  * Created by Bartosz Zurkowski on 20.04.15.
@@ -21,9 +23,7 @@ public class Firefly {
     }
 
     public double getAttractiveness(Firefly other) {
-        // int distance = HammingMeasure.calculateDistance(this, other);
-
-        int distance = 2;
+        int distance = HammingDistance.calculateDistance(this, other);
 
         return baseAttraction * Math.exp((double) -lightAbsorption * distance);
     }
