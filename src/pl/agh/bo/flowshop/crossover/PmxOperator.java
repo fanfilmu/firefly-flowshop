@@ -4,12 +4,20 @@ import pl.agh.bo.flowshop.Firefly;
 
 import java.util.*;
 
+/**
+ * Operator krzyżowania PMX
+ * Konstruktor pobiera *seed* (może być null) oraz absorptionCoefficient, będący parametrem
+ * informującym jak bardzo dziecko powinno być podobne do jednego z rodziców.
+ *
+ * Metoda apply zwraca dwoje dzieci: pierwsze, podobne (w stopniu zależnym od absorptionCoefficient,
+ * im większy tym bardziej podobne) do pierwszego rodzica i drugie, podobne do drugiego rodzica.
+ */
 public class PmxOperator implements CrossoverOperator {
-    private Long seed;
+    private Long seed = null;
     private double absorptionCoefficient;
 
     public PmxOperator() {
-        absorptionCoefficient = 0.5;
+        absorptionCoefficient = 0.4;
     }
 
     public PmxOperator(Long seed, double absorptionCoefficient) {
@@ -38,7 +46,9 @@ public class PmxOperator implements CrossoverOperator {
         int cuttingPoint1;
         int cuttingPoint2;
 
-        int maxSwathSize = (int) Math.ceil(absorptionCoefficient * permutationLength);
+        int maxSwathSize = (int) Math.ceil(1.2 * absorptionCoefficient * permutationLength);
+        int minSwathSize = (int) Math.ceil(0.6 * absorptionCoefficient * permutationLength);
+
 
         // Choosing cutting points
         cuttingPoint1 = random.nextInt(permutationLength);
@@ -54,6 +64,16 @@ public class PmxOperator implements CrossoverOperator {
 
         if (cuttingPoint2 - cuttingPoint1 > maxSwathSize)
             cuttingPoint2 = cuttingPoint1 + maxSwathSize;
+        if (cuttingPoint2 - cuttingPoint1 < minSwathSize) {
+            if (cuttingPoint1 + minSwathSize >= permutationLength) {
+                cuttingPoint1 = permutationLength - minSwathSize;
+                cuttingPoint2 = permutationLength - 1;
+            }
+            else
+                cuttingPoint2 = cuttingPoint1 + minSwathSize;
+        }
+
+        System.out.format("%d - %d (%d - %d)%n", cuttingPoint1, cuttingPoint2, minSwathSize, maxSwathSize);
 
         // initialize replacement subchains
         Integer[] replacement1 = new Integer[permutationLength];
@@ -97,8 +117,8 @@ public class PmxOperator implements CrossoverOperator {
         }
 
         Firefly[] result = new Firefly[2];
-        result[0] = new Firefly(firstOffspring, firefly1.getBaseAttraction(), firefly1.getLightAbsorption());
-        result[1] = new Firefly(secondOffspring, firefly1.getBaseAttraction(), firefly1.getLightAbsorption());
+        result[1] = new Firefly(firstOffspring, firefly1.getBaseAttraction(), firefly1.getLightAbsorption());
+        result[0] = new Firefly(secondOffspring, firefly1.getBaseAttraction(), firefly1.getLightAbsorption());
 
         return result;
     }

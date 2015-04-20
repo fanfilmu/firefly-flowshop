@@ -3,10 +3,6 @@ package pl.agh.bo.flowshop.crossover;
 import org.junit.Test;
 import pl.agh.bo.flowshop.Firefly;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-
 import static org.junit.Assert.*;
 
 public class PmxOperatorTest {
