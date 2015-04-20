@@ -20,6 +20,8 @@ public class Main {
             List<Job> jobs = parser.getJobs();
             for (Job job: jobs)
                 System.out.println(job);
+            Evaluator ev = new Evaluator(jobs);
+            System.out.println("\nThis needs time equals to: " + ev.evaluate());
 
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
