@@ -1,10 +1,32 @@
 package pl.agh.bo.flowshop;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.List;
+
 /**
  * Created by fan on 20.04.15.
  */
 public class Main {
     public static void main(String args[]) {
         System.out.println("Dobry.");
+
+        try {
+            InputParser parser = new InputParser("firefly-flowshop\\test.txt");
+            parser.parse();
+
+            System.out.println("Initial seed: " + parser.getInitialSeed());
+            System.out.println("Jobs:");
+            List<Job> jobs = parser.getJobs();
+            for (Job job: jobs)
+                System.out.println(job);
+
+        } catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
     }
 }
