@@ -15,7 +15,7 @@ public class Firefly {
 
     private Job[] jobsDistribution = null;
 
-    private double lightIntensity;
+    private long lightIntensity;
 
     public Firefly(Job[] jobsDistribution) {
         this.jobsDistribution = jobsDistribution;
@@ -35,11 +35,11 @@ public class Firefly {
         this.jobsDistribution = jobsDistribution;
     }
 
-    public double getLightIntensity() {
+    public long getLightIntensity() {
         return lightIntensity;
     }
 
-    public void setLightIntensity(double lightIntensity) {
+    public void setLightIntensity(long lightIntensity) {
         this.lightIntensity = lightIntensity;
     }
 }

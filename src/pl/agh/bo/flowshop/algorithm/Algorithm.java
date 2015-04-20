@@ -1,8 +1,10 @@
 package pl.agh.bo.flowshop.algorithm;
 
+import pl.agh.bo.flowshop.Evaluator;
 import pl.agh.bo.flowshop.Firefly;
 
-import java.util.HashMap;
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -12,7 +14,7 @@ public class Algorithm {
 
     private final static long MAX_ITERATIONS = 2000;
 
-    private Map<Firefly, Long> fireflies;
+    private Map<Long, Firefly> fireflies;
 
 
     /**
@@ -30,16 +32,16 @@ public class Algorithm {
      * 5. Move randomly the best firefly ?? (that's actually not ideal right now)
      */
 
-    public void start(long initialSeed) {
+    public Firefly start(long initialSeed) {
         int i = 0;
-        Firefly bestOne;
+        Firefly bestOne = null;
 
         // Generate fireflies based on initial seed (calculate their light intensity as well)
         fireflies = generateFireflies(initialSeed);
 
         while (i++ < MAX_ITERATIONS) {
-            for (Firefly fireflyA : fireflies.keySet()) {
-                for (Firefly fireflyB : fireflies.keySet()) {
+            for (Firefly fireflyA : fireflies.values()) {
+                for (Firefly fireflyB : fireflies.values()) {
                     if (!fireflyA.equals(fireflyB)) {
                         // Check light intensity and move fireflies
                         // using PMX crossing
@@ -57,6 +59,7 @@ public class Algorithm {
             bestOne = moveRandomly(bestOne);
         }
 
+        return bestOne;
 
     }
 
@@ -64,15 +67,29 @@ public class Algorithm {
         return null;
     }
 
-    private Firefly findBest(Map<Firefly, Long> fireflies) {
-        return null;
+    private Firefly findBest(Map<Long, Firefly> fireflies) {
+        long bestIntensity = Long.MAX_VALUE;
+        Firefly result = null;
+
+        for (Firefly firefly : fireflies.values()) {
+            if (firefly.getLightIntensity() < bestIntensity) {
+                bestIntensity = firefly.getLightIntensity();
+                result = firefly;
+            }
+        }
+
+        return result;
     }
 
-    private Map<Firefly, Long> recalculateIntensity(Map<Firefly, Long> fireflies) {
-        return null;
+    private Map<Long, Firefly> recalculateIntensity(Map<Long, Firefly> fireflies) {
+
+        for (Firefly firefly : fireflies.values())
+            firefly.setLightIntensity(new Evaluator(Arrays.asList(firefly.getJobsDistribution())).evaluate());
+
+        return fireflies;
     }
 
-    private Map<Firefly, Long> generateFireflies(long initialSeed) {
+    private Map<Long, Firefly> generateFireflies(long initialSeed) {
         return null;
     }
 }
