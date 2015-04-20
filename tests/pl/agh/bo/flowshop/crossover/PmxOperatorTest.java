@@ -9,8 +9,8 @@ public class PmxOperatorTest {
 
     @Test
     public void testApply() throws Exception {
-        Firefly parent1 = new Firefly(new int[] { 0, 1, 2, 3, 4, 5, 6, 7 }, 0.5, 0.5);
-        Firefly parent2 = new Firefly(new int[] { 3, 6, 1, 0, 7, 2, 5, 4 }, 0.5, 0.5);
+        Firefly parent1 = new Firefly(new int[] { 0, 1, 2, 3, 4, 5, 6, 7 });
+        Firefly parent2 = new Firefly(new int[] { 3, 6, 1, 0, 7, 2, 5, 4 });
 
         PmxOperator operator = new PmxOperator();
         Firefly[] result = operator.apply(parent1,parent2);

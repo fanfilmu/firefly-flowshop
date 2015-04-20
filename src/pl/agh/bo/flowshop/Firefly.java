@@ -7,19 +7,16 @@ import pl.agh.bo.flowshop.algorithm.HammingDistance;
  */
 public class Firefly {
 
+    private static final double baseAttraction = 1.0;
+
+    private static final double lightAbsorption = 0.05;
+
     private int[] jobsDistribution;
-
-    private double baseAttraction;
-
-    private double lightAbsorption;
 
     private double lightIntensity;
 
-    public Firefly(int[] jobsDistribution, double baseAttraction, double lightAbsorption) {
+    public Firefly(int[] jobsDistribution) {
         this.jobsDistribution = jobsDistribution;
-        this.baseAttraction   = baseAttraction;
-
-        this.lightAbsorption  = lightAbsorption;
     }
 
     public double getAttractiveness(Firefly other) {
@@ -34,22 +31,6 @@ public class Firefly {
 
     public void setJobsDistribution(int[] jobsDistribution) {
         this.jobsDistribution = jobsDistribution;
-    }
-
-    public double getBaseAttraction() {
-        return baseAttraction;
-    }
-
-    public void setBaseAttraction(double baseAttraction) {
-        this.baseAttraction = baseAttraction;
-    }
-
-    public double getLightAbsorption() {
-        return lightAbsorption;
-    }
-
-    public void setLightAbsorption(double lightAbsorption) {
-        this.lightAbsorption = lightAbsorption;
     }
 
     public double getLightIntensity() {

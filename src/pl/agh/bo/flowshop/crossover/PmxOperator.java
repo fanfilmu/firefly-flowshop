@@ -117,8 +117,8 @@ public class PmxOperator implements CrossoverOperator {
         }
 
         Firefly[] result = new Firefly[2];
-        result[1] = new Firefly(firstOffspring, firefly1.getBaseAttraction(), firefly1.getLightAbsorption());
-        result[0] = new Firefly(secondOffspring, firefly1.getBaseAttraction(), firefly1.getLightAbsorption());
+        result[1] = new Firefly(firstOffspring);
+        result[0] = new Firefly(secondOffspring);
 
         return result;
     }
