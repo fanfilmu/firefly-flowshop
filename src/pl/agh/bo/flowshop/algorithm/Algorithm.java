@@ -64,6 +64,7 @@ public class Algorithm {
     }
 
     private Firefly moveRandomly(Firefly bestOne) {
+        // TODO:
         return null;
     }
 
@@ -90,6 +91,7 @@ public class Algorithm {
     }
 
     private Map<Long, Firefly> generateFireflies(long initialSeed) {
+        // TODO:
         return null;
     }
 }
