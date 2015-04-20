@@ -27,6 +27,9 @@ public class Main {
             e.printStackTrace();
         }
 
+        Firefly firefly1 = new Firefly(new int[]{2, 1, 4, 5, 3}, 2.0, 1.0);
+        Firefly firefly2 = new Firefly(new int[]{1, 2, 4, 3, 5}, 2.0, 1.0);
 
+        System.out.println(firefly1.getAttractiveness(firefly2));
     }
 }
