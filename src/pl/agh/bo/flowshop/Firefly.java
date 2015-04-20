@@ -2,6 +2,8 @@ package pl.agh.bo.flowshop;
 
 import pl.agh.bo.flowshop.algorithm.HammingDistance;
 
+import java.util.List;
+
 /**
  * Created by Bartosz Zurkowski on 20.04.15.
  */
@@ -11,11 +13,11 @@ public class Firefly {
 
     private static final double lightAbsorption = 0.05;
 
-    private int[] jobsDistribution;
+    private Job[] jobsDistribution = null;
 
     private double lightIntensity;
 
-    public Firefly(int[] jobsDistribution) {
+    public Firefly(Job[] jobsDistribution) {
         this.jobsDistribution = jobsDistribution;
     }
 
@@ -25,11 +27,11 @@ public class Firefly {
         return baseAttraction * Math.exp((double) -lightAbsorption * distance);
     }
 
-    public int[] getJobsDistribution() {
+    public Job[] getJobsDistribution() {
         return jobsDistribution;
     }
 
-    public void setJobsDistribution(int[] jobsDistribution) {
+    public void setJobsDistribution(Job[] jobsDistribution) {
         this.jobsDistribution = jobsDistribution;
     }
 

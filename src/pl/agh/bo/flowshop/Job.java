@@ -17,6 +17,10 @@ public class Job {
         return operationTimes;
     }
 
+    public int getId() {
+        return id;
+    }
+
     public String toString() {
         StringBuilder sb = new StringBuilder("ID: " + id  + ", operations: ");
 
