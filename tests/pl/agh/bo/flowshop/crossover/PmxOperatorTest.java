@@ -2,6 +2,7 @@ package pl.agh.bo.flowshop.crossover;
 
 import org.junit.Test;
 import pl.agh.bo.flowshop.Firefly;
+import pl.agh.bo.flowshop.Job;
 
 import static org.junit.Assert.*;
 
@@ -9,8 +10,12 @@ public class PmxOperatorTest {
 
     @Test
     public void testApply() throws Exception {
-        Firefly parent1 = new Firefly(new int[] { 0, 1, 2, 3, 4, 5, 6, 7 });
-        Firefly parent2 = new Firefly(new int[] { 3, 6, 1, 0, 7, 2, 5, 4 });
+        Job[] jobs = new Job[8];
+        for (int i = 0; i < 8; i++)
+            jobs[i] = new Job(i, new Integer[] { 1, 2, 3 });
+
+        Firefly parent1 = new Firefly(new Job[] { jobs[0], jobs[1], jobs[2], jobs[3], jobs[4], jobs[5], jobs[6], jobs[7] });
+        Firefly parent2 = new Firefly(new Job[] { jobs[3], jobs[6], jobs[1], jobs[0], jobs[7], jobs[2], jobs[5], jobs[4] });
 
         PmxOperator operator = new PmxOperator();
         Firefly[] result = operator.apply(parent1,parent2);
@@ -18,12 +23,12 @@ public class PmxOperatorTest {
         int requiredValues1 = 0;
         int requiredValues2 = 0;
 
-        int[] result0 = result[0].getJobsDistribution();
-        int[] result1 = result[1].getJobsDistribution();
+        Job[] result0 = result[0].getJobsDistribution();
+        Job[] result1 = result[1].getJobsDistribution();
 
         for (int i = 0; i < 8; i++) {
-            Integer val1 = result0[i];
-            Integer val2 = result1[i];
+            Integer val1 = result0[i].getId();
+            Integer val2 = result1[i].getId();
 
             System.out.format("%d | %d%n", val1, val2);
 

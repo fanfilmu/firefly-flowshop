@@ -1,6 +1,7 @@
 package pl.agh.bo.flowshop.crossover;
 
 import pl.agh.bo.flowshop.Firefly;
+import pl.agh.bo.flowshop.Job;
 
 import java.util.*;
 
@@ -27,8 +28,8 @@ public class PmxOperator implements CrossoverOperator {
 
     @Override
     public Firefly[] apply(Firefly firefly1, Firefly firefly2) {
-        int[] parent1 = firefly1.getJobsDistribution();
-        int[] parent2 = firefly2.getJobsDistribution();
+        Job[] parent1 = firefly1.getJobsDistribution();
+        Job[] parent2 = firefly2.getJobsDistribution();
 
         int permutationLength = parent1.length;
         if (permutationLength != parent2.length)
@@ -40,8 +41,8 @@ public class PmxOperator implements CrossoverOperator {
             random = new Random(seed);
         else
             random = new Random();
-        int[] firstOffspring = new int[permutationLength];
-        int[] secondOffspring = new int[permutationLength];
+        Job[] firstOffspring = new Job[permutationLength];
+        Job[] secondOffspring = new Job[permutationLength];
 
         int cuttingPoint1;
         int cuttingPoint2;
@@ -76,19 +77,19 @@ public class PmxOperator implements CrossoverOperator {
         System.out.format("%d - %d (%d - %d)%n", cuttingPoint1, cuttingPoint2, minSwathSize, maxSwathSize);
 
         // initialize replacement subchains
-        Integer[] replacement1 = new Integer[permutationLength];
-        Integer[] replacement2 = new Integer[permutationLength];
+        Job[] replacement1 = new Job[permutationLength];
+        Job[] replacement2 = new Job[permutationLength];
 
         for (int i = 0; i < permutationLength; i++)
-            replacement1[i] = replacement2[i] = -1;
+            replacement1[i] = replacement2[i] = null;
 
         // copy the subchains
         for (int i = cuttingPoint1; i <= cuttingPoint2; i++) {
             firstOffspring[i] = parent2[i];
             secondOffspring[i] = parent1[i];
 
-            replacement1[parent2[i]] = parent1[i];
-            replacement2[parent1[i]] = parent2[i];
+            replacement1[parent2[i].getId()] = parent1[i];
+            replacement2[parent1[i].getId()] = parent2[i];
         }
 
 
@@ -96,20 +97,20 @@ public class PmxOperator implements CrossoverOperator {
             if ((i >= cuttingPoint1) && (i <= cuttingPoint2))
                 continue ;
 
-            int n1 = parent1[i];
-            int m1 = replacement1[n1];
+            Job n1 = parent1[i];
+            Job m1 = replacement1[n1.getId()];
 
-            int n2 = parent2[i];
-            int m2 = replacement2[n2];
+            Job n2 = parent2[i];
+            Job m2 = replacement2[n2.getId()];
 
-            while (m1 != -1) {
+            while (m1 != null) {
                 n1 = m1;
-                m1 = replacement1[m1];
+                m1 = replacement1[m1.getId()];
             }
 
-            while (m2 != -1) {
+            while (m2 != null) {
                 n2 = m2;
-                m2 = replacement2[m2];
+                m2 = replacement2[m2.getId()];
             }
 
             firstOffspring[i] = n1;
