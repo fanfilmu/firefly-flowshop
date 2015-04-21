@@ -1,5 +1,6 @@
 package pl.agh.bo.flowshop;
 
+import pl.agh.bo.flowshop.algorithm.Algorithm;
 import pl.agh.bo.flowshop.algorithm.FireflyFactory;
 
 import java.io.FileNotFoundException;
@@ -31,15 +32,13 @@ public class Main {
             e.printStackTrace();
         }
 
-        Job[] jobs = new Job[8];
+        Job[] jobs = new Job[2];
 
-        for (int i = 0; i < 8; i++)
-            jobs[i] = new Job(i, new Integer[] { 1, 2, 3 });
+        jobs[0] = new Job(0, new Integer[] { 20, 10 });
+        jobs[1] = new Job(1, new Integer[] { 10, 20 });
 
-        FireflyFactory fireflyFactory = new FireflyFactory(jobs);
+        Algorithm algo = new Algorithm(jobs);
 
-        Firefly firefly = fireflyFactory.spawnRandom();
-
-        System.out.println(firefly.toString());
+        algo.start(20);
     }
 }

@@ -3,6 +3,7 @@ package pl.agh.bo.flowshop.algorithm;
 import pl.agh.bo.flowshop.Evaluator;
 import pl.agh.bo.flowshop.Firefly;
 import pl.agh.bo.flowshop.Job;
+import pl.agh.bo.flowshop.crossover.PmxOperator;
 
 import java.util.*;
 
@@ -14,6 +15,8 @@ public class Algorithm {
     private final static long MAX_ITERATIONS = 2000;
 
     private final static long POPULATION_SIZE= 100;
+
+    private final static double ABSORPTION_COEFFICIENT = 0.4;
 
     private Map<Long, Firefly> fireflies;
 
@@ -47,13 +50,21 @@ public class Algorithm {
 
         fireflies = recalculateIntensity(fireflies);
 
+        PmxOperator pmx = new PmxOperator(initialSeed, ABSORPTION_COEFFICIENT);
+
         while (i++ < MAX_ITERATIONS) {
-            for (Firefly fireflyA : fireflies.values()) {
-                for (Firefly fireflyB : fireflies.values()) {
-                    if (!fireflyA.equals(fireflyB)) {
-                        // Check light intensity and move fireflies
-                        // using PMX crossing
-                        // TODO: Use PMX here to move fireflies
+            for (Firefly fireflyA : fireflies.values())
+            {
+                for (Firefly fireflyB : fireflies.values())
+                {
+                    if (!fireflyA.equals(fireflyB))
+                    {
+                        if (fireflyA.getLightIntensity() > fireflyB.getLightIntensity()) {
+                            Firefly[] children = pmx.apply(fireflyA, fireflyB);
+
+                            fireflyA.setJobsDistribution(children[0].getJobsDistribution());
+                            fireflyB.setJobsDistribution(children[1].getJobsDistribution());
+                        }
                     }
                 }
             }
@@ -115,9 +126,8 @@ public class Algorithm {
 
         FireflyFactory fireflyFactory = new FireflyFactory(jobs);
 
-
-        for (int i = 0; i < populationSize; i++) {
-            fireflies.put((long) i, fireflyFactory.spawnRandom());
+        for (long i = 0; i < populationSize; i++) {
+            fireflies.put(i, fireflyFactory.spawnRandom());
         }
 
         return fireflies;
