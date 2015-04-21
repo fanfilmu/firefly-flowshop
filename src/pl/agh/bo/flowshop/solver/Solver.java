@@ -1,4 +1,4 @@
-package pl.agh.bo.flowshop.algorithm;
+package pl.agh.bo.flowshop.solver;
 
 import pl.agh.bo.flowshop.Evaluator;
 import pl.agh.bo.flowshop.Firefly;
@@ -10,7 +10,7 @@ import java.util.*;
 /**
  * Created by Andrzej on 2015-04-21.
  */
-public class Algorithm {
+public class Solver {
 
     private final static long MAX_ITERATIONS = 2000;
 
@@ -22,7 +22,7 @@ public class Algorithm {
 
     private Job[] jobs;
 
-    public Algorithm(Job[] jobs) {
+    public Solver(Job[] jobs) {
         this.jobs = jobs;
     }
 
@@ -41,7 +41,7 @@ public class Algorithm {
      * 5. Move randomly the best firefly ?? (that's actually not ideal right now)
      */
 
-    public Firefly start(long initialSeed) {
+    public Firefly run(long initialSeed) {
         int i = 0;
         Firefly bestOne = null;
 

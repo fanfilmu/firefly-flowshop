@@ -1,4 +1,4 @@
-package pl.agh.bo.flowshop.algorithm;
+package pl.agh.bo.flowshop.solver;
 
 import pl.agh.bo.flowshop.Firefly;
 import pl.agh.bo.flowshop.Job;

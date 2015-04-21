@@ -1,4 +1,4 @@
-package pl.agh.bo.flowshop.algorithm;
+package pl.agh.bo.flowshop.solver;
 
 import org.junit.Test;
 import pl.agh.bo.flowshop.Job;

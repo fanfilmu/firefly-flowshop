@@ -1,7 +1,6 @@
 package pl.agh.bo.flowshop;
 
-import pl.agh.bo.flowshop.algorithm.Algorithm;
-import pl.agh.bo.flowshop.algorithm.FireflyFactory;
+import pl.agh.bo.flowshop.solver.Solver;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -37,8 +36,8 @@ public class Main {
         jobs[0] = new Job(0, new Integer[] { 20, 10 });
         jobs[1] = new Job(1, new Integer[] { 10, 20 });
 
-        Algorithm algo = new Algorithm(jobs);
+        Solver algo = new Solver(jobs);
 
-        algo.start(20);
+        algo.run(20);
     }
 }

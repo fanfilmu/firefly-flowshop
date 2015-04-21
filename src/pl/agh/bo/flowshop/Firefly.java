@@ -1,6 +1,6 @@
 package pl.agh.bo.flowshop;
 
-import pl.agh.bo.flowshop.algorithm.HammingDistance;
+import pl.agh.bo.flowshop.solver.HammingDistance;
 
 import java.util.Arrays;
 
