@@ -53,19 +53,16 @@ public class Solver {
         PmxOperator pmx = new PmxOperator(initialSeed, ABSORPTION_COEFFICIENT);
 
         while (i++ < MAX_ITERATIONS) {
-            for (Firefly fireflyA : fireflies.values())
-            {
-                for (Firefly fireflyB : fireflies.values())
-                {
-                    if (!fireflyA.equals(fireflyB))
-                    {
-                        if (fireflyA.getLightIntensity() > fireflyB.getLightIntensity()) {
-                            Firefly[] children = pmx.apply(fireflyA, fireflyB);
+            for (Firefly fireflyA : fireflies.values()) {
+                for (Firefly fireflyB : fireflies.values()) {
+                    if (fireflyA.equals(fireflyB)) continue;
 
-                            fireflyA.setJobsDistribution(children[0].getJobsDistribution());
-                            fireflyB.setJobsDistribution(children[1].getJobsDistribution());
-                        }
-                    }
+                    Firefly[] children = pmx.apply(fireflyA, fireflyB);
+
+                    if (fireflyA.getLightIntensity() > fireflyB.getLightIntensity())
+                        fireflyB.setJobsDistribution(children[0].getJobsDistribution());
+                    else
+                        fireflyA.setJobsDistribution(children[1].getJobsDistribution());
                 }
             }
 

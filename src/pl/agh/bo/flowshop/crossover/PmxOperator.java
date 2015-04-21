@@ -74,8 +74,6 @@ public class PmxOperator implements CrossoverOperator {
                 cuttingPoint2 = cuttingPoint1 + minSwathSize;
         }
 
-        System.out.format("%d - %d (%d - %d)%n", cuttingPoint1, cuttingPoint2, minSwathSize, maxSwathSize);
-
         // initialize replacement subchains
         Job[] replacement1 = new Job[permutationLength];
         Job[] replacement2 = new Job[permutationLength];
