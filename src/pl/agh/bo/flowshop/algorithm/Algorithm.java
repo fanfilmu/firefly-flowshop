@@ -2,11 +2,9 @@ package pl.agh.bo.flowshop.algorithm;
 
 import pl.agh.bo.flowshop.Evaluator;
 import pl.agh.bo.flowshop.Firefly;
+import pl.agh.bo.flowshop.Job;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Created by Andrzej on 2015-04-21.
@@ -15,8 +13,15 @@ public class Algorithm {
 
     private final static long MAX_ITERATIONS = 2000;
 
+    private final static long POPULATION_SIZE= 100;
+
     private Map<Long, Firefly> fireflies;
 
+    private Job[] jobs;
+
+    public Algorithm(Job[] jobs) {
+        this.jobs = jobs;
+    }
 
     /**
      * Pseudcode
@@ -38,7 +43,9 @@ public class Algorithm {
         Firefly bestOne = null;
 
         // Generate fireflies based on initial seed (calculate their light intensity as well)
-        fireflies = generateFireflies(initialSeed);
+        fireflies = generateFireflies(POPULATION_SIZE);
+
+        fireflies = recalculateIntensity(fireflies);
 
         while (i++ < MAX_ITERATIONS) {
             for (Firefly fireflyA : fireflies.values()) {
@@ -103,8 +110,16 @@ public class Algorithm {
         return fireflies;
     }
 
-    private Map<Long, Firefly> generateFireflies(long initialSeed) {
-        // TODO:
-        return null;
+    private Map<Long, Firefly> generateFireflies(long populationSize) {
+        Map<Long, Firefly> fireflies = new HashMap<Long, Firefly>();
+
+        FireflyFactory fireflyFactory = new FireflyFactory(jobs);
+
+
+        for (int i = 0; i < populationSize; i++) {
+            fireflies.put((long) i, fireflyFactory.spawnRandom());
+        }
+
+        return fireflies;
     }
 }

@@ -2,7 +2,7 @@ package pl.agh.bo.flowshop;
 
 import pl.agh.bo.flowshop.algorithm.HammingDistance;
 
-import java.util.List;
+import java.util.Arrays;
 
 /**
  * Created by Bartosz Zurkowski on 20.04.15.
@@ -41,5 +41,13 @@ public class Firefly {
 
     public void setLightIntensity(long lightIntensity) {
         this.lightIntensity = lightIntensity;
+    }
+
+    @Override
+    public String toString() {
+        return "Firefly{" +
+                "lightIntensity=" + lightIntensity +
+                ", jobsDistribution=" + Arrays.toString(jobsDistribution) +
+                '}';
     }
 }
