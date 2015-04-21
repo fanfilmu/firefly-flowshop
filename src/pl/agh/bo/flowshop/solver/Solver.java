@@ -1,6 +1,7 @@
 package pl.agh.bo.flowshop.solver;
 
-import pl.agh.bo.flowshop.Evaluator;
+import pl.agh.bo.flowshop.Evaluator.IEvaluator;
+import pl.agh.bo.flowshop.Evaluator.MakespanEvaluator;
 import pl.agh.bo.flowshop.Firefly;
 import pl.agh.bo.flowshop.Job;
 import pl.agh.bo.flowshop.crossover.PmxOperator;
@@ -12,9 +13,9 @@ import java.util.*;
  */
 public class Solver {
 
-    private final static long MAX_ITERATIONS = 2000;
+    private final static long MAX_ITERATIONS = 30000;
 
-    private final static long POPULATION_SIZE= 100;
+    private final static long POPULATION_SIZE= 20;
 
     private final static double ABSORPTION_COEFFICIENT = 0.4;
 
@@ -31,7 +32,7 @@ public class Solver {
      *
      * 1. Generate fireflies (based on a list of jobs acquired from InputParser).
      *      Mark one as the initial one
-     * 2. Calculate light intensity for every firefly using Evaluator
+     * 2. Calculate light intensity for every firefly using MakespanEvaluator
      * 3. while (i < max_iterations)
      *      for (every firefly_a)
      *          for (every firefly_b)
@@ -112,9 +113,11 @@ public class Solver {
     }
 
     private Map<Long, Firefly> recalculateIntensity(Map<Long, Firefly> fireflies) {
-
-        for (Firefly firefly : fireflies.values())
-            firefly.setLightIntensity(new Evaluator(Arrays.asList(firefly.getJobsDistribution())).evaluate());
+        IEvaluator evaluator = new MakespanEvaluator();
+        for (Firefly firefly : fireflies.values()) {
+            evaluator.setJobs(Arrays.asList(firefly.getJobsDistribution()));
+            firefly.setLightIntensity(evaluator.evaluate());
+        }
 
         return fireflies;
     }

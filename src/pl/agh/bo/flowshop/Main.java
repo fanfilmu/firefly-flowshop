@@ -1,10 +1,10 @@
 package pl.agh.bo.flowshop;
 
+import pl.agh.bo.flowshop.Evaluator.MakespanEvaluator;
 import pl.agh.bo.flowshop.solver.Solver;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -17,7 +17,7 @@ public class Main {
         List<Job> jobs;
 
         try {
-            InputParser parser = new InputParser("test.txt");
+            InputParser parser = new InputParser("firefly-flowshop/test.txt");
             parser.parse();
 
             System.out.println("Initial seed: " + parser.getInitialSeed());
@@ -25,7 +25,8 @@ public class Main {
             jobs = parser.getJobs();
             for (Job job: jobs)
                 System.out.println(job);
-            Evaluator ev = new Evaluator(jobs);
+            MakespanEvaluator ev = new MakespanEvaluator();
+            ev.setJobs(jobs);
             System.out.println("\nThis needs time equals to: " + ev.evaluate());
 
             Solver algo = new Solver(jobs.toArray(new Job[20]));
@@ -33,7 +34,8 @@ public class Main {
 
             for (Job job: result.getJobsDistribution())
                 System.out.println(job);
-            ev = new Evaluator(Arrays.asList(result.getJobsDistribution()));
+
+            ev.setJobs(Arrays.asList(result.getJobsDistribution()));
             System.out.println("\nThis needs time equals to: " + ev.evaluate());
 
         } catch (FileNotFoundException e) {
