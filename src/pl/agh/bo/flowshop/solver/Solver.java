@@ -72,7 +72,8 @@ public class Solver {
             // Find the best firefly
             bestOne = findBest(fireflies);
 
-            bestOne = moveRandomly(bestOne);
+            if (new Random().nextDouble() < 0.1)
+                bestOne = moveRandomly(bestOne);
         }
 
         return bestOne;
