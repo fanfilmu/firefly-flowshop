@@ -6,6 +6,7 @@ import pl.agh.bo.flowshop.Firefly;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * Created by Andrzej on 2015-04-21.
@@ -64,8 +65,20 @@ public class Algorithm {
     }
 
     private Firefly moveRandomly(Firefly bestOne) {
-        // TODO:
-        return null;
+
+        Job[] jobs = bestOne.getJobsDistribution();
+
+        Random random = new Random();
+        int i = random.nextInt(jobs.length);
+        int j = random.nextInt(jobs.length);
+
+        Job tmp = jobs[i];
+        jobs[i] = jobs[j];
+        jobs[j] = tmp;
+
+        bestOne.setJobsDistribution(jobs);
+
+        return bestOne;
     }
 
     private Firefly findBest(Map<Long, Firefly> fireflies) {
