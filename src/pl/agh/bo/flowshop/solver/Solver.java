@@ -60,7 +60,7 @@ public class Solver {
 
                     Firefly[] children = pmx.apply(fireflyA, fireflyB);
 
-                    if (fireflyA.getLightIntensity() > fireflyB.getLightIntensity())
+                    if (fireflyA.getLightIntensity() < fireflyB.getLightIntensity())
                         fireflyB.setJobsDistribution(children[0].getJobsDistribution());
                     else
                         fireflyA.setJobsDistribution(children[1].getJobsDistribution());
