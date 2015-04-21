@@ -63,7 +63,7 @@ public class InputParser {
             for (int j=0 ; j < machineAmount ; j++) {
                 operationTimes[j] = Integer.parseInt(operationTimesStrings[j][i]);
             }
-            jobs.add(new Job(i+1, operationTimes));
+            jobs.add(new Job(i, operationTimes));
         }
 
     }

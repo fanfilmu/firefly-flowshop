@@ -17,7 +17,7 @@ public class Main {
         List<Job> jobs;
 
         try {
-            InputParser parser = new InputParser("firefly-flowshop\\test.txt");
+            InputParser parser = new InputParser("test.txt");
             parser.parse();
 
             System.out.println("Initial seed: " + parser.getInitialSeed());
@@ -28,9 +28,11 @@ public class Main {
             Evaluator ev = new Evaluator(jobs);
             System.out.println("\nThis needs time equals to: " + ev.evaluate());
 
-            Solver algo = new Solver((Job[])jobs.toArray());
+            Solver algo = new Solver(jobs.toArray(new Job[20]));
             Firefly result = algo.run(20);
 
+            for (Job job: result.getJobsDistribution())
+                System.out.println(job);
             ev = new Evaluator(Arrays.asList(result.getJobsDistribution()));
             System.out.println("\nThis needs time equals to: " + ev.evaluate());
 

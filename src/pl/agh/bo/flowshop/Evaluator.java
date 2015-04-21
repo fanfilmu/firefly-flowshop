@@ -23,7 +23,7 @@ public class Evaluator {
         // Build array (easier to work with)
         int i=0;
         for (Job job: jobs)
-            this.operationTimes[i++] = job.getOperationTimes();
+            this.operationTimes[i++] = job.getOperationTimes().clone();
     }
 
     public long evaluate() {
