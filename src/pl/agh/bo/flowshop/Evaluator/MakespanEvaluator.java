@@ -35,8 +35,9 @@ public class MakespanEvaluator implements IEvaluator {
 
         // Build array (easier to work with)
         int i=0;
-        for (Job job: jobs)
+        for (Job job: jobs) {
             this.operationTimes[i++] = job.getOperationTimes().clone();
+        }
     }
 
     /**

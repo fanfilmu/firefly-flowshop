@@ -29,7 +29,7 @@ public class Main {
             ev.setJobs(jobs);
             System.out.println("\nThis needs time equals to: " + ev.evaluate());
 
-            Solver algo = new Solver(jobs.toArray(new Job[20]));
+            Solver algo = new Solver(jobs.toArray(new Job[jobs.size()]));
             Firefly result = algo.run(20);
 
             for (Job job: result.getJobsDistribution())
