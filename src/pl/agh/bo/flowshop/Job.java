@@ -30,4 +30,16 @@ public class Job {
 
         return sb.toString();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Job job = (Job) o;
+
+        if (id != job.id) return false;
+
+        return true;
+    }
 }
