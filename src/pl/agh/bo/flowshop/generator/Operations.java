@@ -1,4 +1,4 @@
-package pl.agh.bo.flowshop.algorithm;
+package pl.agh.bo.flowshop.generator;
 
 import pl.agh.bo.flowshop.Job;
 
@@ -69,13 +69,13 @@ public class Operations {
 
     public static void quickSort(Job[] jobs, int left, int right) {
 
-        int index = partition(arr, left, right);
+        int index = partition(jobs, left, right);
 
         if (left < index - 1)
-            quickSort(arr, left, index - 1);
+            quickSort(jobs, left, index - 1);
 
         if (index < right)
-            quickSort(arr, index, right);
+            quickSort(jobs, index, right);
     }
 
 }
