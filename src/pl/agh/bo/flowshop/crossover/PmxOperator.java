@@ -16,14 +16,18 @@ import java.util.*;
 public class PmxOperator implements CrossoverOperator {
     private Long seed = null;
     private double absorptionCoefficient;
+    private double lightAbsorption;
+    private double baseAttraction;
 
     public PmxOperator() {
         absorptionCoefficient = 0.4;
     }
 
-    public PmxOperator(Long seed, double absorptionCoefficient) {
+    public PmxOperator(Long seed, double baseAttraction, double lightAbsorption, double absorptionCoefficient) {
         this.seed = seed;
         this.absorptionCoefficient = absorptionCoefficient;
+        this.lightAbsorption = lightAbsorption;
+        this.baseAttraction = baseAttraction;
     }
 
     @Override
@@ -116,8 +120,8 @@ public class PmxOperator implements CrossoverOperator {
         }
 
         Firefly[] result = new Firefly[2];
-        result[1] = new Firefly(firstOffspring);
-        result[0] = new Firefly(secondOffspring);
+        result[1] = new Firefly(firstOffspring, baseAttraction, lightAbsorption);
+        result[0] = new Firefly(secondOffspring, baseAttraction, lightAbsorption);
 
         return result;
     }

@@ -9,30 +9,30 @@ import java.util.Arrays;
  */
 public class Firefly {
 
-    private static final double baseAttraction = 1.0;
-
-    private static final double lightAbsorption = 0.05;
-
-    private Job[] jobsDistribution = null;
+    private double mBaseAttraction;
+    private double mLightAbsorption;
+    private Job[] mJobsDistribution = null;
 
     private long lightIntensity;
 
-    public Firefly(Job[] jobsDistribution) {
-        this.jobsDistribution = jobsDistribution;
+    public Firefly(Job[] jobsDistribution, double baseAttraction, double lightAbsorption) {
+        mJobsDistribution = jobsDistribution;
+        mBaseAttraction = baseAttraction;
+        mLightAbsorption = lightAbsorption;
     }
 
     public double getAttractiveness(Firefly other) {
         int distance = HammingDistance.calculateDistance(this, other);
 
-        return baseAttraction * Math.exp((double) -lightAbsorption * distance);
+        return mBaseAttraction * Math.exp((double) -mLightAbsorption * distance);
     }
 
     public Job[] getJobsDistribution() {
-        return jobsDistribution;
+        return mJobsDistribution;
     }
 
     public void setJobsDistribution(Job[] jobsDistribution) {
-        this.jobsDistribution = jobsDistribution;
+        mJobsDistribution = jobsDistribution;
     }
 
     public long getLightIntensity() {
@@ -47,7 +47,7 @@ public class Firefly {
     public String toString() {
         return "Firefly{" +
                 "lightIntensity=" + lightIntensity +
-                ", jobsDistribution=" + Arrays.toString(jobsDistribution) +
+                ", jobsDistribution=" + Arrays.toString(mJobsDistribution) +
                 '}';
     }
 }

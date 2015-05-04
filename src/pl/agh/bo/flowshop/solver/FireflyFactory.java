@@ -9,31 +9,35 @@ public class FireflyFactory {
 
     private Random random = new Random();
 
-    private Job[] jobs;
+    private Job[] mJobs;
+    private double mBaseAttraction;
+    private double mLightAbsorption;
 
-    public FireflyFactory(Job[] jobs) {
-        this.jobs = jobs;
+    public FireflyFactory(Job[] jobs, double baseAttraction, double lightAbsorption) {
+        mJobs = jobs;
+        mBaseAttraction = baseAttraction;
+        mLightAbsorption = lightAbsorption;
     }
 
     public Firefly spawnRandom() {
-        shuffleJobs();
+        shufflemJobs();
 
-        return new Firefly(jobs);
+        return new Firefly(mJobs, mBaseAttraction, mLightAbsorption);
     }
-
-    private void shuffleJobs() {
+    
+    private void shufflemJobs() {
         Job temp;
         int index;
 
-        for (int i = jobs.length - 1; i > 0; i--)
+        for (int i = mJobs.length - 1; i > 0; i--)
         {
             index = random.nextInt(i + 1);
 
             if (index != i)
             {
-                temp = jobs[index];
-                jobs[index] = jobs[i];
-                jobs[i] = temp;
+                temp = mJobs[index];
+                mJobs[index] = mJobs[i];
+                mJobs[i] = temp;
             }
         }
     }
