@@ -13,18 +13,24 @@ import java.util.*;
  */
 public class Solver {
 
-    private final static long MAX_ITERATIONS = 30000;
-
-    private final static long POPULATION_SIZE= 20;
-
-    private final static double ABSORPTION_COEFFICIENT = 0.4;
+    private long mMaxIterations;
+    private long mPopulationSize;
+    private double mAbsorptionCoefficient;
+    private double mLightAbsorption;
+    private double mBaseAttraction;
 
     private Map<Long, Firefly> fireflies;
 
-    private Job[] jobs;
+    private Job[] mJobs;
 
-    public Solver(Job[] jobs) {
-        this.jobs = jobs;
+    public Solver(Job[] jobs, long maxIterations, long populationSize, double absorptionCoefficient, double lightAbsorption,
+                  double baseAttraction) {
+        mJobs = jobs;
+        mMaxIterations = maxIterations;
+        mPopulationSize = populationSize;
+        mAbsorptionCoefficient = absorptionCoefficient;
+        mLightAbsorption = lightAbsorption;
+        mBaseAttraction = baseAttraction;
     }
 
     /**
@@ -33,7 +39,7 @@ public class Solver {
      * 1. Generate fireflies (based on a list of jobs acquired from InputParser).
      *      Mark one as the initial one
      * 2. Calculate light intensity for every firefly using MakespanEvaluator
-     * 3. while (i < max_iterations)
+     * 3. while (i < mMaxIterations)
      *      for (every firefly_a)
      *          for (every firefly_b)
      *              if (light_absorb(firefly_a) > light_absord(firefly_b))
@@ -47,13 +53,13 @@ public class Solver {
         Firefly bestOne = null;
 
         // Generate fireflies based on initial seed (calculate their light intensity as well)
-        fireflies = generateFireflies(POPULATION_SIZE);
+        fireflies = generateFireflies(mPopulationSize);
 
         fireflies = recalculateIntensity(fireflies);
 
-        PmxOperator pmx = new PmxOperator(initialSeed, ABSORPTION_COEFFICIENT);
+        PmxOperator pmx = new PmxOperator(initialSeed, mBaseAttraction, mLightAbsorption, mAbsorptionCoefficient);
 
-        while (i++ < MAX_ITERATIONS) {
+        while (i++ < mMaxIterations) {
             for (Firefly fireflyA : fireflies.values()) {
                 for (Firefly fireflyB : fireflies.values()) {
                     if (fireflyA.equals(fireflyB)) continue;
@@ -125,7 +131,7 @@ public class Solver {
     private Map<Long, Firefly> generateFireflies(long populationSize) {
         Map<Long, Firefly> fireflies = new HashMap<Long, Firefly>();
 
-        FireflyFactory fireflyFactory = new FireflyFactory(jobs);
+        FireflyFactory fireflyFactory = new FireflyFactory(mJobs, mBaseAttraction, mLightAbsorption);
 
         for (long i = 0; i < populationSize; i++) {
             fireflies.put(i, fireflyFactory.spawnRandom());

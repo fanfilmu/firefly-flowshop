@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.Arc2D;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
@@ -31,6 +32,7 @@ public class Main extends Component {
     private JCheckBox CDSCheckBox;
     private JRadioButton PMXRadioButton;
     private JRadioButton swapRadioButton;
+    private JLabel errorLabel;
     private String maxIterations;
     private String populationSize;
     private String absorbtionCoefficient;
@@ -62,9 +64,13 @@ public class Main extends Component {
                 // Gather data from fields
                 getData(Main.this);
 
-                System.out.println("iter: " + maxIterations + ", population: " + populationSize + ", absorb: " + absorbtionCoefficient
-                 + ", base: " + baseAttraction + ", light: " + lightAbsorption + ", neh: " + usesNEH + ", cds: " + usesCDS
-                + ", strategy: " + crossoverStrategy + ", path: " + path );
+                // Check if everything has been filled properly
+                if (checkData()) {
+                    startAlgorithm();
+                    errorLabel.setText("");
+                } else {
+                    errorLabel.setText("Fill the fields properly! Don't forget about file path ;)");
+                }
             }
         });
 
@@ -80,6 +86,29 @@ public class Main extends Component {
                 crossoverStrategy = "swap";
             }
         });
+    }
+
+    private boolean checkData() {
+        boolean result = false;
+
+        // Test if everything is filled
+        if (!maxIterations.equals("") && !populationSize.equals("") && !absorbtionCoefficient.equals("")
+                && !baseAttraction.equals("") && !lightAbsorption.equals("") && !path.equals(""))
+            result = true;
+
+        // Try converting (if anything fails (user didn't fill tv properly) return false)
+        try {
+            Long.parseLong(maxIterations);
+            Long.parseLong(populationSize);
+            Double.parseDouble(absorbtionCoefficient);
+            Double.parseDouble(baseAttraction);
+            Double.parseDouble(lightAbsorption);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+
+        return result;
+
     }
 
     public static void main(String[] args) throws ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException {
@@ -170,13 +199,13 @@ public class Main extends Component {
         data.setUsesNEH(NEHCheckBox.isSelected());
         data.setUsesCDS(CDSCheckBox.isSelected());
     }
-    /*
-    public static void main(String args[]) {
+
+    public void startAlgorithm() {
         System.out.println("Dobry.");
         List<Job> jobs;
 
         try {
-            InputParser parser = new InputParser("firefly-flowshop/test.txt");
+            InputParser parser = new InputParser(path);
             parser.parse();
 
             System.out.println("Initial seed: " + parser.getInitialSeed());
@@ -188,8 +217,10 @@ public class Main extends Component {
             ev.setJobs(jobs);
             System.out.println("\nThis needs time equals to: " + ev.evaluate());
 
-            Solver algo = new Solver(jobs.toArray(new Job[jobs.size()]));
-            Firefly result = algo.run(20);
+            Solver algo = new Solver(jobs.toArray(new Job[jobs.size()]), Long.valueOf(maxIterations),
+                    Long.valueOf(populationSize), Double.valueOf(absorbtionCoefficient),
+                    Double.valueOf(lightAbsorption), Double.valueOf(baseAttraction));
+            Firefly result = algo.run(Long.parseLong(String.valueOf(parser.getInitialSeed())));
 
             for (Job job: result.getJobsDistribution())
                 System.out.println(job);
@@ -203,5 +234,5 @@ public class Main extends Component {
             e.printStackTrace();
         }
     }
-    */
+
 }
