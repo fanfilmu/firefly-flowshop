@@ -3,6 +3,7 @@ package pl.agh.bo.flowshop.crossover;
 import com.sun.org.apache.bcel.internal.generic.SWAP;
 import pl.agh.bo.flowshop.Firefly;
 import pl.agh.bo.flowshop.Job;
+import pl.agh.bo.flowshop.solver.HammingDistance;
 
 import java.util.Random;
 
@@ -41,7 +42,7 @@ public class SwapOperator implements CrossoverOperator
             throw new IllegalArgumentException("Not equal population sizes");
         }
 
-        int numSwaps = getNumberOfSwaps();
+        int numSwaps = getNumberOfSwaps(fireflyA, fireflyB);
 
         Job[] childA = swap(parentA, parentB, numSwaps);
         Job[] childB = swap(parentB, parentA, numSwaps);
@@ -54,7 +55,7 @@ public class SwapOperator implements CrossoverOperator
 
     private Job[] swap(Job[] reference, Job[] target, int numSwaps)
     {
-        Job[] result = cloneParent(target);
+        Job[] result = target.clone();
 
         int populationSize = reference.length;
 
@@ -78,21 +79,12 @@ public class SwapOperator implements CrossoverOperator
         return result;
     }
 
-    private Job[] cloneParent(Job[] parent)
+    private int getNumberOfSwaps(Firefly fireflyA, Firefly fireflyB)
     {
-        int size = parent.length;
+        float swapFraction = randomGenerator.nextFloat();
 
-        Job[] child = new Job[size];
+        int distance = HammingDistance.calculateDistance(fireflyA, fireflyB);
 
-        for (int i = 0; i < size; i++) {
-            child[i] = parent[i];
-        }
-
-        return child;
-    }
-
-    private int getNumberOfSwaps()
-    {
-        return randomGenerator.nextInt(MAX_SWAP_NUM - MIN_SWAP_NUM) + MIN_SWAP_NUM;
+        return Math.round(swapFraction * distance);
     }
 }
