@@ -203,30 +203,35 @@ public class Main extends Component {
     public void startAlgorithm() {
         System.out.println("Dobry.");
         List<Job> jobs;
+        StringBuilder defaultCombinationResult = new StringBuilder("DEFAULT COMBINATION\n\n");
+        StringBuilder ourCombinationResult = new StringBuilder("SOLVER COMBINATION\n\n");
 
         try {
             InputParser parser = new InputParser(path);
             parser.parse();
 
-            System.out.println("Initial seed: " + parser.getInitialSeed());
-            System.out.println("Jobs:");
+            defaultCombinationResult.append("Jobs:\n");
             jobs = parser.getJobs();
             for (Job job: jobs)
-                System.out.println(job);
+                defaultCombinationResult.append(job + "\n");
             MakespanEvaluator ev = new MakespanEvaluator();
             ev.setJobs(jobs);
-            System.out.println("\nThis needs time equals to: " + ev.evaluate());
+            defaultCombinationResult.append("\nThis needs time equal to: " + ev.evaluate());
 
             Solver algo = new Solver(jobs.toArray(new Job[jobs.size()]), Long.valueOf(maxIterations),
                     Long.valueOf(populationSize), Double.valueOf(absorbtionCoefficient),
                     Double.valueOf(lightAbsorption), Double.valueOf(baseAttraction));
             Firefly result = algo.run(Long.parseLong(String.valueOf(parser.getInitialSeed())));
 
+            ourCombinationResult.append("Jobs:\n");
             for (Job job: result.getJobsDistribution())
-                System.out.println(job);
+                ourCombinationResult.append(job + "\n");
 
             ev.setJobs(Arrays.asList(result.getJobsDistribution()));
-            System.out.println("\nThis needs time equals to: " + ev.evaluate());
+            ourCombinationResult.append("\nThis needs time equal to: " + ev.evaluate());
+
+            // Run results dialog
+            Results results = new Results(defaultCombinationResult.toString(), ourCombinationResult.toString());
 
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
