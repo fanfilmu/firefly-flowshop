@@ -15,19 +15,19 @@ import java.util.*;
  */
 public class PmxOperator implements CrossoverOperator {
     private Long seed = null;
-    private double absorptionCoefficient;
     private double lightAbsorption;
     private double baseAttraction;
+    private Random random;
 
-    public PmxOperator() {
-        absorptionCoefficient = 0.4;
-    }
-
-    public PmxOperator(Long seed, double baseAttraction, double lightAbsorption, double absorptionCoefficient) {
+    public PmxOperator(Long seed, double baseAttraction, double lightAbsorption) {
         this.seed = seed;
-        this.absorptionCoefficient = absorptionCoefficient;
         this.lightAbsorption = lightAbsorption;
         this.baseAttraction = baseAttraction;
+
+        if (seed != null)
+            random = new Random(seed);
+        else
+            random = new Random();
     }
 
     @Override
@@ -40,43 +40,12 @@ public class PmxOperator implements CrossoverOperator {
             throw new IllegalArgumentException(
                 String.format("Size of the first parent (%d) is not equal to the size of the second parent (%d)", parent1.length, parent2.length));
 
-        Random random;
-        if (seed != null)
-            random = new Random(seed);
-        else
-            random = new Random();
         Job[] firstOffspring = new Job[permutationLength];
         Job[] secondOffspring = new Job[permutationLength];
 
-        int cuttingPoint1;
-        int cuttingPoint2;
-
-        int maxSwathSize = (int) Math.ceil(1.2 * absorptionCoefficient * permutationLength);
-        int minSwathSize = (int) Math.ceil(0.6 * absorptionCoefficient * permutationLength);
-
-
-        // Choosing cutting points
-        cuttingPoint1 = random.nextInt(permutationLength);
-        cuttingPoint2 = random.nextInt(permutationLength);
-        while (cuttingPoint2 == cuttingPoint1)
-            cuttingPoint2 = random.nextInt(permutationLength);
-
-        if (cuttingPoint1 > cuttingPoint2) {
-            int swap = cuttingPoint1;
-            cuttingPoint1 = cuttingPoint2;
-            cuttingPoint2 = swap;
-        }
-
-        if (cuttingPoint2 - cuttingPoint1 > maxSwathSize)
-            cuttingPoint2 = cuttingPoint1 + maxSwathSize;
-        if (cuttingPoint2 - cuttingPoint1 < minSwathSize) {
-            if (cuttingPoint1 + minSwathSize >= permutationLength) {
-                cuttingPoint1 = permutationLength - minSwathSize;
-                cuttingPoint2 = permutationLength - 1;
-            }
-            else
-                cuttingPoint2 = cuttingPoint1 + minSwathSize;
-        }
+        int swathSize = random.nextInt(permutationLength - 2) + 2;
+        int cuttingPoint1 = random.nextInt(permutationLength + 1 - swathSize);
+        int cuttingPoint2 = cuttingPoint1 + swathSize - 1;
 
         // initialize replacement subchains
         Job[] replacement1 = new Job[permutationLength];
@@ -124,13 +93,5 @@ public class PmxOperator implements CrossoverOperator {
         result[0] = new Firefly(secondOffspring, baseAttraction, lightAbsorption);
 
         return result;
-    }
-
-    public double getAbsorptionCoefficient() {
-        return absorptionCoefficient;
-    }
-
-    public void setAbsorptionCoefficient(double absorptionCoefficient) {
-        this.absorptionCoefficient = absorptionCoefficient;
     }
 }

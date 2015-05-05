@@ -17,8 +17,8 @@ public class PmxOperatorTest {
         Firefly parent1 = new Firefly(new Job[] { jobs[0], jobs[1], jobs[2], jobs[3], jobs[4], jobs[5], jobs[6], jobs[7] }, 1, 1);
         Firefly parent2 = new Firefly(new Job[] { jobs[3], jobs[6], jobs[1], jobs[0], jobs[7], jobs[2], jobs[5], jobs[4] }, 1, 1);
 
-        PmxOperator operator = new PmxOperator();
-        Firefly[] result = operator.apply(parent1,parent2);
+        PmxOperator operator = new PmxOperator(16516L, 1, 1);
+        Firefly[] result = operator.apply(parent1, parent2);
 
         int requiredValues1 = 0;
         int requiredValues2 = 0;

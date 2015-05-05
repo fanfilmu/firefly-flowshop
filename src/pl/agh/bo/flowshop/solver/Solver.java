@@ -18,6 +18,7 @@ public class Solver {
     private double mAbsorptionCoefficient;
     private double mLightAbsorption;
     private double mBaseAttraction;
+    private IEvaluator evaluator;
 
     private Map<Long, Firefly> fireflies;
 
@@ -31,6 +32,7 @@ public class Solver {
         mAbsorptionCoefficient = absorptionCoefficient;
         mLightAbsorption = lightAbsorption;
         mBaseAttraction = baseAttraction;
+        evaluator = new MakespanEvaluator();
     }
 
     /**
@@ -53,23 +55,38 @@ public class Solver {
         Firefly bestOne = null;
 
         // Generate fireflies based on initial seed (calculate their light intensity as well)
+        System.out.format("Generating fireflies...%n");
         fireflies = generateFireflies(mPopulationSize);
 
+        System.out.format("Assigning initial light intensity...%n");
         fireflies = recalculateIntensity(fireflies);
 
-        PmxOperator pmx = new PmxOperator(initialSeed, mBaseAttraction, mLightAbsorption, mAbsorptionCoefficient);
+        PmxOperator pmx = new PmxOperator(initialSeed, mBaseAttraction, mLightAbsorption);
+        Firefly[] children;
 
         while (i++ < mMaxIterations) {
+            if (i % 100 == 0) System.out.format("%d of %d%n", i, mMaxIterations);
+
             for (Firefly fireflyA : fireflies.values()) {
                 for (Firefly fireflyB : fireflies.values()) {
                     if (fireflyA.equals(fireflyB)) continue;
 
-                    Firefly[] children = pmx.apply(fireflyA, fireflyB);
+                    // jezeli B jest gorszy niz A, przenosimy B w lepsze miejsce
+                    if (fireflyB.getLightIntensity() > fireflyA.getLightIntensity()) {
+                        children = pmx.apply(fireflyA, fireflyB);
+                        evaluator.setJobs(Arrays.asList(children[0].getJobsDistribution()));
+                        long firstChild = evaluator.evaluate();
+                        evaluator.setJobs(Arrays.asList(children[1].getJobsDistribution()));
+                        long secondChild = evaluator.evaluate();
 
-                    if (fireflyA.getLightIntensity() < fireflyB.getLightIntensity())
-                        fireflyB.setJobsDistribution(children[0].getJobsDistribution());
-                    else
-                        fireflyA.setJobsDistribution(children[1].getJobsDistribution());
+                        if (firstChild < fireflyB.getLightIntensity() && firstChild < secondChild) {
+                            fireflyB.setJobsDistribution(children[0].getJobsDistribution());
+                            fireflyB.setLightIntensity(firstChild);
+                        } else if (secondChild < fireflyB.getLightIntensity() && secondChild < firstChild) {
+                            fireflyB.setJobsDistribution(children[1].getJobsDistribution());
+                            fireflyB.setLightIntensity(secondChild);
+                        }
+                    }
                 }
             }
 
@@ -119,7 +136,6 @@ public class Solver {
     }
 
     private Map<Long, Firefly> recalculateIntensity(Map<Long, Firefly> fireflies) {
-        IEvaluator evaluator = new MakespanEvaluator();
         for (Firefly firefly : fireflies.values()) {
             evaluator.setJobs(Arrays.asList(firefly.getJobsDistribution()));
             firefly.setLightIntensity(evaluator.evaluate());

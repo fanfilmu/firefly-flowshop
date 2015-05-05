@@ -14,7 +14,7 @@ public class FireflyFactory {
     private double mLightAbsorption;
 
     public FireflyFactory(Job[] jobs, double baseAttraction, double lightAbsorption) {
-        mJobs = jobs;
+        mJobs = jobs.clone();
         mBaseAttraction = baseAttraction;
         mLightAbsorption = lightAbsorption;
     }
@@ -22,7 +22,7 @@ public class FireflyFactory {
     public Firefly spawnRandom() {
         shufflemJobs();
 
-        return new Firefly(mJobs, mBaseAttraction, mLightAbsorption);
+        return new Firefly(mJobs.clone(), mBaseAttraction, mLightAbsorption);
     }
     
     private void shufflemJobs() {
