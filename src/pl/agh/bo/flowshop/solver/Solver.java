@@ -5,6 +5,7 @@ import pl.agh.bo.flowshop.Evaluator.MakespanEvaluator;
 import pl.agh.bo.flowshop.Firefly;
 import pl.agh.bo.flowshop.Job;
 import pl.agh.bo.flowshop.crossover.PmxOperator;
+import pl.agh.bo.flowshop.crossover.SwapOperator;
 
 import java.util.*;
 
@@ -61,6 +62,8 @@ public class Solver {
         System.out.format("Assigning initial light intensity...%n");
         fireflies = recalculateIntensity(fireflies);
 
+
+        
         PmxOperator pmx = new PmxOperator(initialSeed, mBaseAttraction, mLightAbsorption);
         Firefly[] children;
 
