@@ -1,4 +1,4 @@
-package pl.agh.bo.flowshop.generator;
+package pl.agh.bo.flowshop.generator.neh;
 
 import pl.agh.bo.flowshop.Job;
 

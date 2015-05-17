@@ -2,6 +2,7 @@ package pl.agh.bo.flowshop.generator;
 
 import org.junit.Test;
 import pl.agh.bo.flowshop.Job;
+import pl.agh.bo.flowshop.generator.cds.CdsConstructor;
 
 import static org.junit.Assert.*;
 

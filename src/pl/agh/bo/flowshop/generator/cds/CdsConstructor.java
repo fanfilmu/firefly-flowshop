@@ -1,9 +1,10 @@
-package pl.agh.bo.flowshop.generator;
+package pl.agh.bo.flowshop.generator.cds;
 
 import pl.agh.bo.flowshop.evaluator.IEvaluator;
 import pl.agh.bo.flowshop.evaluator.MakespanEvaluator;
 import pl.agh.bo.flowshop.Firefly;
 import pl.agh.bo.flowshop.Job;
+import pl.agh.bo.flowshop.generator.Constructor;
 
 import java.util.*;
 

@@ -24,6 +24,7 @@ public class Solver {
     private double mBaseAttraction;
     private String crossoverOperator;
     private boolean cds;
+    private boolean neh;
     private IEvaluator evaluator;
 
     private Map<Long, Firefly> fireflies;
@@ -31,7 +32,7 @@ public class Solver {
     private Job[] mJobs;
 
     public Solver(Job[] jobs, long maxIterations, long populationSize, double absorptionCoefficient, double lightAbsorption,
-                  double baseAttraction, String crossoverOperator, boolean cds) {
+                  double baseAttraction, String crossoverOperator, boolean cds, boolean neh) {
         mJobs = jobs;
         mMaxIterations = maxIterations;
         mPopulationSize = populationSize;
@@ -40,6 +41,7 @@ public class Solver {
         mBaseAttraction = baseAttraction;
         this.crossoverOperator = crossoverOperator;
         this.cds = cds;
+        this.neh = neh;
         evaluator = new MakespanEvaluator();
     }
 
@@ -127,7 +129,11 @@ public class Solver {
         long i = population.size();
 
         if (cds) {
-            population.put(i, fireflyFactory.spawn(ConstructorType.CDS));
+            population.put(i++, fireflyFactory.spawn(ConstructorType.CDS));
+        }
+
+        if (neh) {
+            population.put(i++, fireflyFactory.spawn(ConstructorType.NEH));
         }
 
         return population;
