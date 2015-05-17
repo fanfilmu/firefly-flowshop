@@ -4,6 +4,7 @@ import pl.agh.bo.flowshop.Evaluator.IEvaluator;
 import pl.agh.bo.flowshop.Evaluator.MakespanEvaluator;
 import pl.agh.bo.flowshop.Firefly;
 import pl.agh.bo.flowshop.Job;
+import pl.agh.bo.flowshop.crossover.CrossoverOperator;
 import pl.agh.bo.flowshop.crossover.PmxOperator;
 import pl.agh.bo.flowshop.crossover.SwapOperator;
 
@@ -19,6 +20,7 @@ public class Solver {
     private double mAbsorptionCoefficient;
     private double mLightAbsorption;
     private double mBaseAttraction;
+    private String crossoverOperator;
     private IEvaluator evaluator;
 
     private Map<Long, Firefly> fireflies;
@@ -26,13 +28,14 @@ public class Solver {
     private Job[] mJobs;
 
     public Solver(Job[] jobs, long maxIterations, long populationSize, double absorptionCoefficient, double lightAbsorption,
-                  double baseAttraction) {
+                  double baseAttraction, String crossoverOperator) {
         mJobs = jobs;
         mMaxIterations = maxIterations;
         mPopulationSize = populationSize;
         mAbsorptionCoefficient = absorptionCoefficient;
         mLightAbsorption = lightAbsorption;
         mBaseAttraction = baseAttraction;
+        this.crossoverOperator = crossoverOperator;
         evaluator = new MakespanEvaluator();
     }
 
@@ -62,9 +65,13 @@ public class Solver {
         System.out.format("Assigning initial light intensity...%n");
         fireflies = recalculateIntensity(fireflies);
 
+        CrossoverOperator crossOp;
 
-        
-        PmxOperator pmx = new PmxOperator(initialSeed, mBaseAttraction, mLightAbsorption);
+        if (crossoverOperator.equals("swap")) {
+            crossOp = new SwapOperator(mBaseAttraction, mLightAbsorption);
+        } else {
+            crossOp = new PmxOperator(initialSeed, mBaseAttraction, mLightAbsorption);
+        }
         Firefly[] children;
 
         while (i++ < mMaxIterations) {
@@ -76,7 +83,7 @@ public class Solver {
 
                     // jezeli B jest gorszy niz A, przenosimy B w lepsze miejsce
                     if (fireflyB.getLightIntensity() > fireflyA.getLightIntensity()) {
-                        children = pmx.apply(fireflyA, fireflyB);
+                        children = crossOp.apply(fireflyA, fireflyB);
                         evaluator.setJobs(Arrays.asList(children[0].getJobsDistribution()));
                         long firstChild = evaluator.evaluate();
                         evaluator.setJobs(Arrays.asList(children[1].getJobsDistribution()));

@@ -220,7 +220,7 @@ public class Main extends Component {
 
             Solver algo = new Solver(jobs.toArray(new Job[jobs.size()]), Long.valueOf(maxIterations),
                     Long.valueOf(populationSize), Double.valueOf(absorbtionCoefficient),
-                    Double.valueOf(lightAbsorption), Double.valueOf(baseAttraction));
+                    Double.valueOf(lightAbsorption), Double.valueOf(baseAttraction), crossoverStrategy);
             Firefly result = algo.run(Long.parseLong(String.valueOf(parser.getInitialSeed())));
 
             ourCombinationResult.append("Jobs:\n");
