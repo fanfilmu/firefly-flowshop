@@ -1,6 +1,5 @@
-package pl.agh.bo.flowshop.Evaluator;
+package pl.agh.bo.flowshop.evaluator;
 
-import pl.agh.bo.flowshop.Evaluator.IEvaluator;
 import pl.agh.bo.flowshop.Job;
 
 import java.util.ArrayList;

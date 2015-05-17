@@ -9,7 +9,7 @@ public class CdsConstructorTest {
 
     @Test
     public void testApply() throws Exception {
-        CdsConstructor constructor = new CdsConstructor();
+        CdsConstructor constructor = new CdsConstructor(1, 1);
         Job[] jobs = new Job[] {
                 new Job(0, new Integer[] { 6, 5, 4 }),
                 new Job(1, new Integer[] { 8, 1, 4 }),

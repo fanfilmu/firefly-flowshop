@@ -1,8 +1,7 @@
 package pl.agh.bo.flowshop.generator;
 
-import javafx.collections.transformation.SortedList;
-import pl.agh.bo.flowshop.Evaluator.IEvaluator;
-import pl.agh.bo.flowshop.Evaluator.MakespanEvaluator;
+import pl.agh.bo.flowshop.evaluator.IEvaluator;
+import pl.agh.bo.flowshop.evaluator.MakespanEvaluator;
 import pl.agh.bo.flowshop.Firefly;
 import pl.agh.bo.flowshop.Job;
 
@@ -14,7 +13,16 @@ import java.util.*;
  * 1. https://nikhatshahin.wordpress.com/2011/10/18/ma0044-q5-explain-the-steps-involved-in-johnson%E2%80%99s-algorithm-and-cds-algorithm/
  * 2. http://faculty.ksu.edu.sa/ialharkan/IE428/Chapter_4.pdf
  */
-public class CdsConstructor {
+public class CdsConstructor implements Constructor {
+    private double baseAttraction;
+
+    private double lightAbsorption;
+
+    public CdsConstructor(double baseAttraction, double lightAbsorption) {
+        this.baseAttraction = baseAttraction;
+        this.lightAbsorption = lightAbsorption;
+    }
+
     public Firefly apply(Job[] jobs) {
         int jobCount = jobs.length;
         Job[] bestSolution = null;
@@ -40,7 +48,7 @@ public class CdsConstructor {
             }
         }
 
-        return new Firefly(bestSolution);
+        return new Firefly(bestSolution, baseAttraction, lightAbsorption);
     }
 
     private void joinSets(Job[] problem, Job[] result, List<Job> sptSet, List<Job> lptSet) {

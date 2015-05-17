@@ -1,13 +1,12 @@
 package pl.agh.bo.flowshop;
 
-import pl.agh.bo.flowshop.Evaluator.MakespanEvaluator;
+import pl.agh.bo.flowshop.evaluator.MakespanEvaluator;
 import pl.agh.bo.flowshop.solver.Solver;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.geom.Arc2D;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
@@ -220,7 +219,7 @@ public class Main extends Component {
 
             Solver algo = new Solver(jobs.toArray(new Job[jobs.size()]), Long.valueOf(maxIterations),
                     Long.valueOf(populationSize), Double.valueOf(absorbtionCoefficient),
-                    Double.valueOf(lightAbsorption), Double.valueOf(baseAttraction), crossoverStrategy);
+                    Double.valueOf(lightAbsorption), Double.valueOf(baseAttraction), crossoverStrategy, usesNEH);
             Firefly result = algo.run(Long.parseLong(String.valueOf(parser.getInitialSeed())));
 
             ourCombinationResult.append("Jobs:\n");

@@ -1,12 +1,14 @@
 package pl.agh.bo.flowshop.solver;
 
-import pl.agh.bo.flowshop.Evaluator.IEvaluator;
-import pl.agh.bo.flowshop.Evaluator.MakespanEvaluator;
+import pl.agh.bo.flowshop.evaluator.IEvaluator;
+import pl.agh.bo.flowshop.evaluator.MakespanEvaluator;
 import pl.agh.bo.flowshop.Firefly;
 import pl.agh.bo.flowshop.Job;
 import pl.agh.bo.flowshop.crossover.CrossoverOperator;
 import pl.agh.bo.flowshop.crossover.PmxOperator;
 import pl.agh.bo.flowshop.crossover.SwapOperator;
+import pl.agh.bo.flowshop.generator.ConstructorType;
+import pl.agh.bo.flowshop.generator.FireflyFactory;
 
 import java.util.*;
 
@@ -21,6 +23,7 @@ public class Solver {
     private double mLightAbsorption;
     private double mBaseAttraction;
     private String crossoverOperator;
+    private boolean cds;
     private IEvaluator evaluator;
 
     private Map<Long, Firefly> fireflies;
@@ -28,7 +31,7 @@ public class Solver {
     private Job[] mJobs;
 
     public Solver(Job[] jobs, long maxIterations, long populationSize, double absorptionCoefficient, double lightAbsorption,
-                  double baseAttraction, String crossoverOperator) {
+                  double baseAttraction, String crossoverOperator, boolean cds) {
         mJobs = jobs;
         mMaxIterations = maxIterations;
         mPopulationSize = populationSize;
@@ -36,6 +39,7 @@ public class Solver {
         mLightAbsorption = lightAbsorption;
         mBaseAttraction = baseAttraction;
         this.crossoverOperator = crossoverOperator;
+        this.cds = cds;
         evaluator = new MakespanEvaluator();
     }
 
@@ -60,7 +64,8 @@ public class Solver {
 
         // Generate fireflies based on initial seed (calculate their light intensity as well)
         System.out.format("Generating fireflies...%n");
-        fireflies = generateFireflies(mPopulationSize);
+
+        fireflies = generateInitialPopulation();
 
         System.out.format("Assigning initial light intensity...%n");
         fireflies = recalculateIntensity(fireflies);
@@ -114,6 +119,20 @@ public class Solver {
 
     }
 
+    private Map<Long, Firefly> generateInitialPopulation() {
+        FireflyFactory fireflyFactory = new FireflyFactory(mJobs, mBaseAttraction, mLightAbsorption);
+
+        Map<Long, Firefly> population = fireflyFactory.spawnRandomPopulation(mPopulationSize);
+
+        long i = population.size();
+
+        if (cds) {
+            population.put(i, fireflyFactory.spawn(ConstructorType.CDS));
+        }
+
+        return population;
+    }
+
     private Firefly moveRandomly(Firefly bestOne) {
 
         Job[] jobs = bestOne.getJobsDistribution();
@@ -149,18 +168,6 @@ public class Solver {
         for (Firefly firefly : fireflies.values()) {
             evaluator.setJobs(Arrays.asList(firefly.getJobsDistribution()));
             firefly.setLightIntensity(evaluator.evaluate());
-        }
-
-        return fireflies;
-    }
-
-    private Map<Long, Firefly> generateFireflies(long populationSize) {
-        Map<Long, Firefly> fireflies = new HashMap<Long, Firefly>();
-
-        FireflyFactory fireflyFactory = new FireflyFactory(mJobs, mBaseAttraction, mLightAbsorption);
-
-        for (long i = 0; i < populationSize; i++) {
-            fireflies.put(i, fireflyFactory.spawnRandom());
         }
 
         return fireflies;
