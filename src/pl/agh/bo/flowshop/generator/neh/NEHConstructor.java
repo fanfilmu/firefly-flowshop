@@ -8,12 +8,12 @@ import pl.agh.bo.flowshop.generator.Constructor;
 
 import java.util.Arrays;
 
-public class NehConstructor implements Constructor {
+public class NEHConstructor implements Constructor {
     private double baseAttraction;
 
     private double lightAbsorption;
 
-    public NehConstructor(double baseAttraction, double lightAbsorption) {
+    public NEHConstructor(double baseAttraction, double lightAbsorption) {
         this.baseAttraction = baseAttraction;
         this.lightAbsorption = lightAbsorption;
     }

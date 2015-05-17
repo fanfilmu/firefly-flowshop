@@ -2,8 +2,8 @@ package pl.agh.bo.flowshop.generator;
 
 import pl.agh.bo.flowshop.Firefly;
 import pl.agh.bo.flowshop.Job;
-import pl.agh.bo.flowshop.generator.cds.CdsConstructor;
-import pl.agh.bo.flowshop.generator.neh.NehConstructor;
+import pl.agh.bo.flowshop.generator.cds.CDSConstructor;
+import pl.agh.bo.flowshop.generator.neh.NEHConstructor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,10 +34,10 @@ public class FireflyFactory {
 
         switch (constructorType) {
             case NEH:
-                constructor = new NehConstructor(baseAttraction, lightAbsorption);
+                constructor = new NEHConstructor(baseAttraction, lightAbsorption);
                 break;
             default:
-                constructor = new CdsConstructor(baseAttraction, lightAbsorption);
+                constructor = new CDSConstructor(baseAttraction, lightAbsorption);
                 break;
         }
 

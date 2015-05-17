@@ -218,7 +218,7 @@ public class Main extends Component {
             defaultCombinationResult.append("\nThis needs time equal to: " + ev.evaluate());
 
             Solver algo = new Solver(jobs.toArray(new Job[jobs.size()]), Long.valueOf(maxIterations),
-                    Long.valueOf(populationSize), Double.valueOf(absorbtionCoefficient),
+                    Long.valueOf(populationSize),
                     Double.valueOf(lightAbsorption), Double.valueOf(baseAttraction), crossoverStrategy, usesCDS, usesNEH);
             Firefly result = algo.run(Long.parseLong(String.valueOf(parser.getInitialSeed())));
 

@@ -2,15 +2,15 @@ package pl.agh.bo.flowshop.generator;
 
 import org.junit.Test;
 import pl.agh.bo.flowshop.Job;
-import pl.agh.bo.flowshop.generator.cds.CdsConstructor;
+import pl.agh.bo.flowshop.generator.cds.CDSConstructor;
 
 import static org.junit.Assert.*;
 
-public class CdsConstructorTest {
+public class CDSConstructorTest {
 
     @Test
     public void testApply() throws Exception {
-        CdsConstructor constructor = new CdsConstructor(1, 1);
+        CDSConstructor constructor = new CDSConstructor(1, 1);
         Job[] jobs = new Job[] {
                 new Job(0, new Integer[] { 6, 5, 4 }),
                 new Job(1, new Integer[] { 8, 1, 4 }),

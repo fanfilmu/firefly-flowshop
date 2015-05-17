@@ -17,54 +17,47 @@ import java.util.*;
  */
 public class Solver {
 
-    private long mMaxIterations;
-    private long mPopulationSize;
-    private double mAbsorptionCoefficient;
-    private double mLightAbsorption;
-    private double mBaseAttraction;
+    private long maxIterations;
+    private long populationSize;
+
+    private double lightAbsorption;
+    private double baseAttraction;
+
     private String crossoverOperator;
+
     private boolean cds;
     private boolean neh;
+
     private IEvaluator evaluator;
 
     private Map<Long, Firefly> fireflies;
 
-    private Job[] mJobs;
+    private Job[] jobs;
 
-    public Solver(Job[] jobs, long maxIterations, long populationSize, double absorptionCoefficient, double lightAbsorption,
+    public Solver(Job[] jobs, long maxIterations, long populationSize, double lightAbsorption,
                   double baseAttraction, String crossoverOperator, boolean cds, boolean neh) {
-        mJobs = jobs;
-        mMaxIterations = maxIterations;
-        mPopulationSize = populationSize;
-        mAbsorptionCoefficient = absorptionCoefficient;
-        mLightAbsorption = lightAbsorption;
-        mBaseAttraction = baseAttraction;
+        // TODO: What about absorption coefficient?
+
+        this.jobs = jobs;
+
+        this.maxIterations = maxIterations;
+        this.populationSize = populationSize;
+
+        this.lightAbsorption = lightAbsorption;
+        this.baseAttraction = baseAttraction;
+
         this.crossoverOperator = crossoverOperator;
+
         this.cds = cds;
         this.neh = neh;
-        evaluator = new MakespanEvaluator();
-    }
 
-    /**
-     * Pseudcode
-     *
-     * 1. Generate fireflies (based on a list of jobs acquired from InputParser).
-     *      Mark one as the initial one
-     * 2. Calculate light intensity for every firefly using MakespanEvaluator
-     * 3. while (i < mMaxIterations)
-     *      for (every firefly_a)
-     *          for (every firefly_b)
-     *              if (light_absorb(firefly_a) > light_absord(firefly_b))
-     *                  swap firefly_a vector randomly ^^
-     * 4. Recalculate light intensity for every firefly
-     * 5. Move randomly the best firefly ?? (that's actually not ideal right now)
-     */
+        this.evaluator = new MakespanEvaluator();
+    }
 
     public Firefly run(long initialSeed) {
         int i = 0;
         Firefly bestOne = null;
 
-        // Generate fireflies based on initial seed (calculate their light intensity as well)
         System.out.format("Generating fireflies...%n");
 
         fireflies = generateInitialPopulation();
@@ -75,14 +68,14 @@ public class Solver {
         CrossoverOperator crossOp;
 
         if (crossoverOperator.equals("swap")) {
-            crossOp = new SwapOperator(mBaseAttraction, mLightAbsorption);
+            crossOp = new SwapOperator(baseAttraction, lightAbsorption);
         } else {
-            crossOp = new PmxOperator(initialSeed, mBaseAttraction, mLightAbsorption);
+            crossOp = new PmxOperator(initialSeed, baseAttraction, lightAbsorption);
         }
         Firefly[] children;
 
-        while (i++ < mMaxIterations) {
-            if (i % 100 == 0) System.out.format("%d of %d%n", i, mMaxIterations);
+        while (i++ < maxIterations) {
+            if (i % 100 == 0) System.out.format("%d of %d%n", i, maxIterations);
 
             for (Firefly fireflyA : fireflies.values()) {
                 for (Firefly fireflyB : fireflies.values()) {
@@ -122,9 +115,9 @@ public class Solver {
     }
 
     private Map<Long, Firefly> generateInitialPopulation() {
-        FireflyFactory fireflyFactory = new FireflyFactory(mJobs, mBaseAttraction, mLightAbsorption);
+        FireflyFactory fireflyFactory = new FireflyFactory(jobs, baseAttraction, lightAbsorption);
 
-        Map<Long, Firefly> population = fireflyFactory.spawnRandomPopulation(mPopulationSize);
+        Map<Long, Firefly> population = fireflyFactory.spawnRandomPopulation(populationSize);
 
         long i = population.size();
 

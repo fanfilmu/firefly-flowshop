@@ -14,12 +14,12 @@ import java.util.*;
  * 1. https://nikhatshahin.wordpress.com/2011/10/18/ma0044-q5-explain-the-steps-involved-in-johnson%E2%80%99s-algorithm-and-cds-algorithm/
  * 2. http://faculty.ksu.edu.sa/ialharkan/IE428/Chapter_4.pdf
  */
-public class CdsConstructor implements Constructor {
+public class CDSConstructor implements Constructor {
     private double baseAttraction;
 
     private double lightAbsorption;
 
-    public CdsConstructor(double baseAttraction, double lightAbsorption) {
+    public CDSConstructor(double baseAttraction, double lightAbsorption) {
         this.baseAttraction = baseAttraction;
         this.lightAbsorption = lightAbsorption;
     }
