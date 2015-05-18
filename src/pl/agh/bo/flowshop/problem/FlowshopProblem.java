@@ -2,6 +2,7 @@ package pl.agh.bo.flowshop.problem;
 
 import pl.agh.bo.flowshop.evaluator.IEvaluator;
 import pl.agh.bo.flowshop.evaluator.MakespanEvaluator;
+import pl.agh.bo.flowshop.solution.FlowshopSolution;
 
 /**
  * This structure-like class contains information about an instance of a Flowhop problem
@@ -14,12 +15,12 @@ public class FlowshopProblem {
     public int[][] jobs;
     private IEvaluator evaluator = new MakespanEvaluator();
 
-    public long evaluateSolution(int[] order) {
-        int[][] solution = new int[order.length][];
-        for (int i = 0; i < order.length; i++)
-            solution[i] = jobs[order[i]];
+    public long evaluateSolution(FlowshopSolution solution) {
+        int[][] jobs = new int[solution.getLength()][];
+        for (int i = 0; i < jobs.length; i++)
+            jobs[i] = jobs[solution.get(i)];
 
-        evaluator.setJobs(solution);
+        evaluator.setJobs(jobs);
         return evaluator.evaluate();
     }
 }
