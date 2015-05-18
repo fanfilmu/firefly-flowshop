@@ -34,7 +34,7 @@ public class FireflyFactory {
 
         switch (constructorType) {
             case NEH:
-                constructor = new NEHConstructor(baseAttraction, lightAbsorption);
+                constructor = new NEHConstructor(-1);
                 break;
             default:
                 constructor = new CDSConstructor(baseAttraction, lightAbsorption);
