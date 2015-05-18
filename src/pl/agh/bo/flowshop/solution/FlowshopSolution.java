@@ -1,7 +1,5 @@
 package pl.agh.bo.flowshop.solution;
 
-import java.util.Iterator;
-
 /**
  * This interface represents specific solution of the flowshop problem,
  * that is an order of jobs to be executed. It must implement Iterator<Integer>
@@ -41,4 +39,7 @@ public interface FlowshopSolution {
      * @return Length of the solution
      */
     int getLength();
+
+    FlowshopSolution getNewInstance();
+    FlowshopSolution clone();
 }
