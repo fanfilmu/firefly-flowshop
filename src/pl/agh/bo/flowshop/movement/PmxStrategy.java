@@ -10,12 +10,6 @@ import java.util.Random;
 import static java.lang.System.exit;
 
 public class PmxStrategy extends AbstractMovementStrategy {
-    Random random;
-
-    public PmxStrategy() {
-        random = new Random();
-    }
-
     // http://www.rubicite.com/Tutorials/GeneticAlgorithms/CrossoverOperators/PMXCrossoverOperator.aspx
     @Override
     public FlowshopSolution move(FlowshopSolution first, FlowshopSolution second, FlowshopProblem problem, SolverParameters params) {
