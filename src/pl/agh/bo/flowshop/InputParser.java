@@ -1,18 +1,17 @@
 package pl.agh.bo.flowshop;
 
+import pl.agh.bo.flowshop.problem.FlowshopProblem;
+import pl.agh.bo.flowshop.problem.FlowshopProblemBuilder;
+
 import java.io.*;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * Created by Andrzej on 2015-04-20.
- */
 public class InputParser {
 
     private final String filename;
     long initialSeed;
-    private List<List<Job>> parsedJobs;
+    private List<FlowshopProblem> parsedProblems;
 
     public InputParser(String filename) throws FileNotFoundException {
         // Get the file handler
@@ -20,7 +19,7 @@ public class InputParser {
         if (!file.exists()) throw new FileNotFoundException("Podaj ścieżkę do poprawnego pliku ;)");
 
         this.filename = filename;
-        this.parsedJobs = new LinkedList<>();
+        this.parsedProblems = new LinkedList<>();
     }
 
     /**
@@ -30,47 +29,48 @@ public class InputParser {
         String line;
         String params[];
         String[][] operationTimesStrings;
-        int jobsAmount, machinesAmount, upperBound, lowerBound;
-        Integer operationTimes[];
-        long initialSeed;
-        List<Job> jobs;
+        int operationTimes[];
+        int jobs[][];
+        FlowshopProblem problem;
 
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
             // new problem definition - first line has no meaning
             while (reader.readLine() != null) {
-                jobs = new LinkedList<Job>();
-
                 // global problem parameters expected, e.g.
                 // 100 5 896678084 5495 5437
                 line = reader.readLine();
                 params = line.trim().split("[ ]+");
 
-                jobsAmount = Integer.parseInt(params[0]);
-                machinesAmount = Integer.parseInt(params[1]);
-                initialSeed = Long.parseLong(params[2]); //TODO add initial seed and bounds to problem definition
-                upperBound = Integer.parseInt(params[3]);
-                lowerBound = Integer.parseInt(params[4]);
-                operationTimesStrings = new String[machinesAmount][jobsAmount];
+                problem = new FlowshopProblemBuilder()
+                        .setJobCount(params[0])
+                        .setOperationCount(params[1])
+                        .setInitialSeed(params[2])
+                        .setUpperBound(params[3])
+                        .setLowerBound(params[4]).build();
+
+                operationTimesStrings = new String[problem.operationCount][problem.jobCount];
+                jobs = new int[problem.jobCount][problem.operationCount];
 
                 // skip "processing times" caption
                 reader.readLine();
 
-
-                for (int i = 0; i < machinesAmount; i++) {
+                for (int i = 0; i < problem.operationCount; i++) {
                     // read operation costs
                     operationTimesStrings[i] = reader.readLine().trim().split("[ ]+");
                 }
 
                 // build collection of jobs
-                for (int i = 0; i < jobsAmount; i++) {
-                    operationTimes = new Integer[machinesAmount];
-                    for (int j = 0; j < machinesAmount; j++) {
+                for (int i = 0; i < problem.jobCount; i++) {
+                    operationTimes = new int[problem.operationCount];
+                    for (int j = 0; j < problem.operationCount; j++) {
                         operationTimes[j] = Integer.parseInt(operationTimesStrings[j][i]);
                     }
-                    jobs.add(new Job(i, operationTimes));
+                    jobs[i] = operationTimes;
                 }
 
-                parsedJobs.add(jobs);
+                problem.jobs = jobs;
+
+                parsedProblems.add(problem);
             }
         }
     }
@@ -79,7 +79,7 @@ public class InputParser {
         return initialSeed;
     }
 
-    public List<List<Job>> getJobs() {
-        return parsedJobs;
+    public List<FlowshopProblem> getProblems() {
+        return parsedProblems;
     }
 }
