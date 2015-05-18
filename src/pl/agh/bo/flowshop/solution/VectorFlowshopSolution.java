@@ -54,4 +54,9 @@ public class VectorFlowshopSolution implements FlowshopSolution {
 
         return result;
     }
+
+    @Override
+    public FlowshopSolutionType getType() {
+        return FlowshopSolutionType.VECTOR;
+    }
 }

@@ -1,9 +1,8 @@
-package pl.agh.bo.flowshop.generator.cds;
+package pl.agh.bo.flowshop.solution.generator;
 
-import pl.agh.bo.flowshop.Job;
-import pl.agh.bo.flowshop.generator.Constructor;
 import pl.agh.bo.flowshop.problem.FlowshopProblem;
 import pl.agh.bo.flowshop.solution.FlowshopSolution;
+import pl.agh.bo.flowshop.solution.FlowshopSolutionType;
 import pl.agh.bo.flowshop.solution.SolutionFactory;
 
 import java.util.*;
@@ -15,16 +14,7 @@ import java.util.*;
  * 2. http://faculty.ksu.edu.sa/ialharkan/IE428/Chapter_4.pdf
  */
 public class CDSConstructor implements Constructor {
-    private double baseAttraction;
-
-    private double lightAbsorption;
-
-    public CDSConstructor(double baseAttraction, double lightAbsorption) {
-        this.baseAttraction = baseAttraction;
-        this.lightAbsorption = lightAbsorption;
-    }
-
-    public FlowshopSolution apply(FlowshopProblem problem, SolutionFactory.SolutionType type) {
+    public FlowshopSolution apply(FlowshopProblem problem, FlowshopSolutionType type) {
         FlowshopSolution bestSolution = null;
         long bestSolutionEvaluation = Integer.MAX_VALUE;
 

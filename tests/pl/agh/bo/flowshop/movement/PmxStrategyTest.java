@@ -4,6 +4,7 @@ import org.junit.Test;
 import pl.agh.bo.flowshop.InputParser;
 import pl.agh.bo.flowshop.problem.FlowshopProblem;
 import pl.agh.bo.flowshop.solution.FlowshopSolution;
+import pl.agh.bo.flowshop.solution.FlowshopSolutionType;
 import pl.agh.bo.flowshop.solution.SolutionFactory;
 import pl.agh.bo.flowshop.solver.HammingDistance;
 import pl.agh.bo.flowshop.solver.SolverParameters;
@@ -19,7 +20,7 @@ public class PmxStrategyTest {
         FlowshopProblem problem = parser.getProblems().get(0);
         SolverParameters params = new SolverParameters();
 
-        SolutionFactory factory = new SolutionFactory(problem, SolutionFactory.SolutionType.VECTOR, SolutionFactory.GeneratorType.RANDOM);
+        SolutionFactory factory = new SolutionFactory(problem, FlowshopSolutionType.VECTOR, SolutionFactory.GeneratorType.RANDOM);
         FlowshopSolution solution1 =  factory.spawn();
         FlowshopSolution solution2 =  factory.spawn();
 

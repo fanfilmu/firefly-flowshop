@@ -1,7 +1,8 @@
-package pl.agh.bo.flowshop.generator.neh;
+package pl.agh.bo.flowshop.solution.generator.neh;
 
 import org.junit.Test;
-import pl.agh.bo.flowshop.generator.cds.CDSConstructor;
+import pl.agh.bo.flowshop.solution.FlowshopSolutionType;
+import pl.agh.bo.flowshop.solution.generator.NEHConstructor;
 import pl.agh.bo.flowshop.problem.FlowshopProblem;
 import pl.agh.bo.flowshop.solution.FlowshopSolution;
 import pl.agh.bo.flowshop.solution.SolutionFactory;
@@ -23,11 +24,11 @@ public class NEHConstructorTest {
         problem.jobs[3] = new int[] { 4, 8, 8, 7, 2 };
         problem.jobs[4] = new int[] { 3, 5, 6, 3, 7 };
 
-        FlowshopSolution solution = constructor.apply(problem, SolutionFactory.SolutionType.VECTOR);
+        FlowshopSolution solution = constructor.apply(problem, FlowshopSolutionType.VECTOR);
         assertArrayEquals(new int[] { 4, 3, 1, 2, 0 }, solution.getOrder());
 
         constructor = new NEHConstructor(4);
-        solution = constructor.apply(problem, SolutionFactory.SolutionType.VECTOR);
+        solution = constructor.apply(problem, FlowshopSolutionType.VECTOR);
         assertArrayEquals(new int[] { 3, 1, 2, 0, 4 }, solution.getOrder());
     }
 }

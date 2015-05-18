@@ -1,12 +1,8 @@
-package pl.agh.bo.flowshop.generator.neh;
+package pl.agh.bo.flowshop.solution.generator;
 
-import pl.agh.bo.flowshop.evaluator.IEvaluator;
-import pl.agh.bo.flowshop.evaluator.MakespanEvaluator;
-import pl.agh.bo.flowshop.Firefly;
-import pl.agh.bo.flowshop.Job;
-import pl.agh.bo.flowshop.generator.Constructor;
 import pl.agh.bo.flowshop.problem.FlowshopProblem;
 import pl.agh.bo.flowshop.solution.FlowshopSolution;
+import pl.agh.bo.flowshop.solution.FlowshopSolutionType;
 import pl.agh.bo.flowshop.solution.SolutionFactory;
 
 import java.util.LinkedList;
@@ -25,7 +21,7 @@ public class NEHConstructor implements Constructor {
     }
 
     @Override
-    public FlowshopSolution apply(FlowshopProblem problem, SolutionFactory.SolutionType type) {
+    public FlowshopSolution apply(FlowshopProblem problem, FlowshopSolutionType type) {
         // clone jobs
         LinkedList<JobStruct> jobs = new LinkedList<>();
         for (int i = 0; i < problem.jobCount; i++)

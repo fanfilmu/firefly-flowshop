@@ -40,6 +40,8 @@ public interface FlowshopSolution {
      */
     int getLength();
 
+    FlowshopSolutionType getType();
+
     FlowshopSolution getNewInstance();
     FlowshopSolution clone();
 }
