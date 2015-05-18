@@ -1,5 +1,8 @@
-package pl.agh.bo.flowshop;
+package pl.agh.bo.flowshop.GUI;
 
+import pl.agh.bo.flowshop.Firefly;
+import pl.agh.bo.flowshop.InputParser;
+import pl.agh.bo.flowshop.Job;
 import pl.agh.bo.flowshop.evaluator.MakespanEvaluator;
 import pl.agh.bo.flowshop.solver.Solver;
 
@@ -118,7 +121,6 @@ public class Main extends Component {
                 UIManager.getSystemLookAndFeelClassName());
         JFrame frame = new JFrame("Main");
         frame.setContentPane(new Main().mainPanel);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
     }
@@ -206,7 +208,7 @@ public class Main extends Component {
         StringBuilder ourCombinationResult = new StringBuilder("SOLVER COMBINATION\n\n");
 
         try {
-            InputParser parser = new InputParser(path);
+            final InputParser parser = new InputParser(path);
             parser.parse();
 
             defaultCombinationResult.append("Jobs:\n");
@@ -217,20 +219,22 @@ public class Main extends Component {
             ev.setJobs(jobs);
             defaultCombinationResult.append("\nThis needs time equal to: " + ev.evaluate());
 
-            Solver algo = new Solver(jobs.toArray(new Job[jobs.size()]), Long.valueOf(maxIterations),
+            final Solver algo = new Solver(jobs.toArray(new Job[jobs.size()]), Long.valueOf(maxIterations),
                     Long.valueOf(populationSize),
                     Double.valueOf(lightAbsorption), Double.valueOf(baseAttraction), crossoverStrategy, usesCDS, usesNEH);
-            Firefly result = algo.run(Long.parseLong(String.valueOf(parser.getInitialSeed())));
 
-            ourCombinationResult.append("Jobs:\n");
-            for (Job job: result.getJobsDistribution())
-                ourCombinationResult.append(job + "\n");
+            // Initialize chart displaying results
+            final ResultsChart resultsChart = new ResultsChart("Firefly algorithm");
+            resultsChart.display(maxIterations, populationSize, lightAbsorption, baseAttraction,
+                    crossoverStrategy, String.valueOf(usesCDS), String.valueOf(usesNEH));
 
-            ev.setJobs(Arrays.asList(result.getJobsDistribution()));
-            ourCombinationResult.append("\nThis needs time equal to: " + ev.evaluate());
-
-            // Run results dialog
-            Results results = new Results(defaultCombinationResult.toString(), ourCombinationResult.toString());
+            // Run the algorithm
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    algo.run(Long.parseLong(String.valueOf(parser.getInitialSeed())), resultsChart);
+                }
+            }).start();
 
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());

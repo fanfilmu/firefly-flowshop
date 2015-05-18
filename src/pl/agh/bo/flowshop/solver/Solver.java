@@ -1,5 +1,6 @@
 package pl.agh.bo.flowshop.solver;
 
+import pl.agh.bo.flowshop.GUI.ResultsChart;
 import pl.agh.bo.flowshop.evaluator.IEvaluator;
 import pl.agh.bo.flowshop.evaluator.MakespanEvaluator;
 import pl.agh.bo.flowshop.Firefly;
@@ -34,6 +35,8 @@ public class Solver {
 
     private Job[] jobs;
 
+    private ResultsChart resultsChart;
+
     public Solver(Job[] jobs, long maxIterations, long populationSize, double lightAbsorption,
                   double baseAttraction, String crossoverOperator, boolean cds, boolean neh) {
         // TODO: What about absorption coefficient?
@@ -54,9 +57,13 @@ public class Solver {
         this.evaluator = new MakespanEvaluator();
     }
 
-    public Firefly run(long initialSeed) {
+    public Firefly run(long initialSeed, ResultsChart resultsChart) {
         int i = 0;
         Firefly bestOne = null;
+        this.resultsChart = resultsChart;
+
+        // Start measuring time of algorithm
+        long startTime = System.nanoTime();
 
         System.out.format("Generating fireflies...%n");
 
@@ -106,9 +113,20 @@ public class Solver {
             // Find the best firefly
             bestOne = findBest(fireflies);
 
+            // Tell about it ResultsChart
+            resultsChart.addResult(i, bestOne.getLightIntensity());
+
             if (new Random().nextDouble() < 0.1)
                 bestOne = moveRandomly(bestOne);
         }
+
+
+        // Stop measuring time of algorithm and supply it to results form
+        long stopTime = System.nanoTime();
+        double elapsedTime = (stopTime - startTime)/(1000000000.0);
+
+        // Show the user results
+        resultsChart.showResults(bestOne, elapsedTime);
 
         return bestOne;
 
