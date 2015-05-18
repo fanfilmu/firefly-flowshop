@@ -210,7 +210,7 @@ public class Main extends Component {
             parser.parse();
 
             defaultCombinationResult.append("Jobs:\n");
-            jobs = parser.getJobs();
+            jobs = parser.getJobs().get(0);
             for (Job job: jobs)
                 defaultCombinationResult.append(job + "\n");
             MakespanEvaluator ev = new MakespanEvaluator();

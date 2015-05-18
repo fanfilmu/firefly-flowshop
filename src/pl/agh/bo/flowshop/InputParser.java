@@ -2,6 +2,7 @@ package pl.agh.bo.flowshop;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -9,70 +10,76 @@ import java.util.List;
  */
 public class InputParser {
 
-    private File file;
-    private BufferedReader reader;
-    private long initialSeed;
-    private List<Job> jobs;
-    private String[][] operationTimesStrings;
+    private final String filename;
+    long initialSeed;
+    private List<List<Job>> parsedJobs;
 
-    public InputParser(String fileName) throws FileNotFoundException {
+    public InputParser(String filename) throws FileNotFoundException {
         // Get the file handler
-        String path = new File(".").getAbsolutePath();
-        file = new File(fileName);
+        File file = new File(filename);
         if (!file.exists()) throw new FileNotFoundException("Podaj ścieżkę do poprawnego pliku ;)");
 
-        // Get file reader
-        reader = new BufferedReader(new FileReader(fileName));
-
-        // Initialize list of jobs
-        jobs = new ArrayList<Job>();
+        this.filename = filename;
+        this.parsedJobs = new LinkedList<>();
     }
 
     /**
      * Parse the file. Get collections of jobs and initial seed
      */
     public void parse() throws IOException {
-        // Read first line. It's not important
-        reader.readLine();
-        String[] data = reader.readLine().split(" ");
+        String line;
+        String params[];
+        String[][] operationTimesStrings;
+        int jobsAmount, machinesAmount, upperBound, lowerBound;
+        Integer operationTimes[];
+        long initialSeed;
+        List<Job> jobs;
 
-        // Get number of jobs
-        int jobsAmount = Integer.valueOf(data[0]);
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+            // new problem definition - first line has no meaning
+            while (reader.readLine() != null) {
+                jobs = new LinkedList<Job>();
 
-        // Get number of operations (easier to iterate over file)
-        int machineAmount = Integer.valueOf(data[1]);
+                // global problem parameters expected, e.g.
+                // 100 5 896678084 5495 5437
+                line = reader.readLine();
+                params = line.trim().split("[ ]+");
 
-        // Get initial seed
-        initialSeed = Long.valueOf(data[2]);
+                jobsAmount = Integer.parseInt(params[0]);
+                machinesAmount = Integer.parseInt(params[1]);
+                initialSeed = Long.parseLong(params[2]); //TODO add initial seed and bounds to problem definition
+                upperBound = Integer.parseInt(params[3]);
+                lowerBound = Integer.parseInt(params[4]);
+                operationTimesStrings = new String[machinesAmount][jobsAmount];
 
-        // Initialize array of operation times
-        operationTimesStrings = new String[machineAmount][jobsAmount];
+                // skip "processing times" caption
+                reader.readLine();
 
-        // Read another title line
-        reader.readLine();
 
-        // Build operationTimesStrings array
-        for (int i=0 ; i < machineAmount; i++) {
-            // Read line and fill the array
-            operationTimesStrings[i] = reader.readLine().split(" ");
-        }
+                for (int i = 0; i < machinesAmount; i++) {
+                    // read operation costs
+                    operationTimesStrings[i] = reader.readLine().trim().split("[ ]+");
+                }
 
-        // Build collection of jobs
-        for (int i=0 ; i < jobsAmount; i++) {
-            Integer[] operationTimes = new Integer[machineAmount];
-            for (int j=0 ; j < machineAmount ; j++) {
-                operationTimes[j] = Integer.parseInt(operationTimesStrings[j][i]);
+                // build collection of jobs
+                for (int i = 0; i < jobsAmount; i++) {
+                    operationTimes = new Integer[machinesAmount];
+                    for (int j = 0; j < machinesAmount; j++) {
+                        operationTimes[j] = Integer.parseInt(operationTimesStrings[j][i]);
+                    }
+                    jobs.add(new Job(i, operationTimes));
+                }
+
+                parsedJobs.add(jobs);
             }
-            jobs.add(new Job(i, operationTimes));
         }
-
     }
 
     public long getInitialSeed() {
         return initialSeed;
     }
 
-    public List<Job> getJobs() {
-        return jobs;
+    public List<List<Job>> getJobs() {
+        return parsedJobs;
     }
 }
