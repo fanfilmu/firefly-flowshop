@@ -1,6 +1,6 @@
-package pl.agh.bo.flowshop;
+package pl.agh.bo.flowshop.GUI;
 
-import pl.agh.bo.flowshop.evaluator.MakespanEvaluator;
+import pl.agh.bo.flowshop.InputParser;
 import pl.agh.bo.flowshop.movement.MovementStrategyType;
 import pl.agh.bo.flowshop.problem.FlowshopProblem;
 import pl.agh.bo.flowshop.solution.FlowshopSolution;
@@ -12,8 +12,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Created by fan on 20.04.15.
@@ -73,7 +71,6 @@ public class Main extends Component {
                 UIManager.getSystemLookAndFeelClassName());
         JFrame frame = new JFrame("Main");
         frame.setContentPane(new Main().mainPanel);
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
     }
@@ -84,11 +81,12 @@ public class Main extends Component {
         FlowshopProblem problem;
 
         try {
-            InputParser parser = new InputParser(path);
+            final InputParser parser = new InputParser(path);
             parser.parse();
 
             problem = parser.getProblems().get(0);
             defaultCombinationResult.append("Jobs:\n");
+
             for (int i = 0; i < problem.jobCount; i++) {
                 defaultCombinationResult.append(String.format("ID: %d ; [", i));
                 for (int j = 0; j < problem.operationCount; j++)
@@ -102,16 +100,21 @@ public class Main extends Component {
             defaultCombinationResult.append("\nThis needs time equal to: " + problem.evaluateSolution(initial));
 
             Solver solver = new Solver(problem, parameters);
-            FlowshopSolution solution = solver.run();
 
-            ourCombinationResult.append("Jobs:\n");
-            for (int id : solution.getOrder())
-                ourCombinationResult.append(String.format("%4d%n", id));
+            // Initialize chart displaying results
+            final ResultsChart resultsChart = new ResultsChart("Firefly algorithm");
+            resultsChart.display(String.valueOf(parameters.maxIterations), String.valueOf(parameters.populationSize),
+                    String.valueOf(parameters.absorptionCoefficient),
+                    String.valueOf(parameters.baseAttraction), parameters.movementStrategy.toString(),
+                    String.valueOf(parameters.useCds), String.valueOf(parameters.useNeh));
 
-            ourCombinationResult.append("\nThis needs time equal to: " + problem.evaluateSolution(solution));
-
-            // Run results dialog
-            Results results = new Results(defaultCombinationResult.toString(), ourCombinationResult.toString());
+            // Run the algorithm
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    solver.run(resultsChart);
+                }
+            }).start();
 
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
