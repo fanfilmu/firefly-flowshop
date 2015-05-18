@@ -15,9 +15,7 @@ import java.util.List;
  */
 public class MakespanEvaluator implements IEvaluator {
 
-    private List<Job> jobs;
-    private int jobsAmount;
-    private Integer[][] operationTimes;
+    private int[][] jobs;
     // Keep this so as not to waste time looking at rows with all zeros
     private int firstNonZeroRow;
 
@@ -26,17 +24,9 @@ public class MakespanEvaluator implements IEvaluator {
      * @param jobs List of Job objects
      */
     @Override
-    public void setJobs(List<Job> jobs) {
+    public void setJobs(int[][] jobs) {
         this.jobs = jobs;
-        this.jobsAmount = jobs.size();
-        this.operationTimes = new Integer[jobsAmount][];
         this.firstNonZeroRow = 0;
-
-        // Build array (easier to work with)
-        int i=0;
-        for (Job job: jobs) {
-            this.operationTimes[i++] = job.getOperationTimes().clone();
-        }
     }
 
     /**
@@ -155,6 +145,10 @@ public class MakespanEvaluator implements IEvaluator {
 
         */
 
+        // copy jobs array to operationTimes helper array
+        int[][] operationTimes = new int[jobs.length][];
+        for (int i = 0; i < jobs.length; i++)
+            operationTimes[i] = jobs[i].clone();
 
         //Let's implement it ^^
 
@@ -164,7 +158,7 @@ public class MakespanEvaluator implements IEvaluator {
         // Make it 0
         operationTimes[0][0] = 0;
 
-        List<Coordinates> availableOperations = getAvailableOperations();
+        List<Coordinates> availableOperations = getAvailableOperations(operationTimes);
         if (availableOperations.isEmpty()) return result;
 
         Coordinates smallest;
@@ -181,13 +175,13 @@ public class MakespanEvaluator implements IEvaluator {
                 operationTimes[coord.getX()][coord.getY()] -= smallestValue;
 
             // Get new available operations
-            availableOperations = getAvailableOperations();
+            availableOperations = getAvailableOperations(operationTimes);
         }
 
         return result;
     }
 
-    private List<Coordinates> getAvailableOperations() {
+    private List<Coordinates> getAvailableOperations(int[][] operationTimes) {
         List<Coordinates> result = new ArrayList<Coordinates>();
         int j;
 
@@ -198,7 +192,7 @@ public class MakespanEvaluator implements IEvaluator {
             // Explanation of this is in the evaluate() method
             if (j < operationTimes[0].length && operationTimes[i][j] != 0
                     && (i == 0 || operationTimes[i-1][j] == 0))
-                result.add(new Coordinates(i,j));
+                result.add(new Coordinates(i, j, operationTimes));
             else if (j == operationTimes[0].length) {
                 // We just moved through row with all zeros so forget about it ;)
                 firstNonZeroRow = i + 1;
@@ -211,11 +205,13 @@ public class MakespanEvaluator implements IEvaluator {
     }
 
     private class Coordinates implements Comparable<Coordinates>{
+        private final int[][] operationTimes;
         private int x,y;
 
-        public Coordinates(int x, int y) {
+        public Coordinates(int x, int y, int[][] operationTimes) {
             this.x = x;
             this.y = y;
+            this.operationTimes = operationTimes;
         }
 
         public int getX() {
@@ -228,8 +224,7 @@ public class MakespanEvaluator implements IEvaluator {
 
         @Override
         public int compareTo(Coordinates other) {
-            return operationTimes[this.getX()][this.getY()].
-                    compareTo(operationTimes[other.getX()][other.getY()]);
+            return operationTimes[this.getX()][this.getY()] - operationTimes[other.getX()][other.getY()];
         }
 
         @Override

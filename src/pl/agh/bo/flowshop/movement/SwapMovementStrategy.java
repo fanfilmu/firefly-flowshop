@@ -6,7 +6,7 @@ import pl.agh.bo.flowshop.solver.SolverParameters;
 
 public class SwapMovementStrategy extends AbstractMovementStrategy {
     @Override
-    public FlowshopSolution move(FlowshopSolution first, FlowshopSolution second, FlowshopProblem problem, SolverParameters params) throws IllegalAccessException, InstantiationException {
+    public FlowshopSolution move(FlowshopSolution first, FlowshopSolution second, FlowshopProblem problem, SolverParameters params) {
         int currentDistance = calculateDistance(first, second);
         int swaps = getNumberOfSwaps(currentDistance, params);
 

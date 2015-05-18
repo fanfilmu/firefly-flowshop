@@ -44,4 +44,6 @@ public interface FlowshopSolution {
 
     FlowshopSolution getNewInstance();
     FlowshopSolution clone();
+
+    void setOrderFrom(FlowshopSolution other);
 }

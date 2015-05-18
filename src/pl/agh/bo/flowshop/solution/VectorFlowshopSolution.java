@@ -59,4 +59,10 @@ public class VectorFlowshopSolution implements FlowshopSolution {
     public FlowshopSolutionType getType() {
         return FlowshopSolutionType.VECTOR;
     }
+
+    @Override
+    public void setOrderFrom(FlowshopSolution other) {
+        for (int i = 0; i < getLength(); i++)
+            set(i, other.get(i));
+    }
 }

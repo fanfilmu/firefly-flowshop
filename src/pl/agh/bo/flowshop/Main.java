@@ -1,12 +1,15 @@
 package pl.agh.bo.flowshop;
 
 import pl.agh.bo.flowshop.evaluator.MakespanEvaluator;
+import pl.agh.bo.flowshop.movement.MovementStrategyType;
+import pl.agh.bo.flowshop.problem.FlowshopProblem;
+import pl.agh.bo.flowshop.solution.FlowshopSolution;
+import pl.agh.bo.flowshop.solution.VectorFlowshopSolution;
 import pl.agh.bo.flowshop.solver.Solver;
+import pl.agh.bo.flowshop.solver.SolverParameters;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
@@ -24,7 +27,6 @@ public class Main extends Component {
     private JTextField populationSizeTV;
     private JTextField absorbtionCoefficientTV;
     private JTextField baseAttractionTV;
-    private JTextField lightAbsorptionTV;
     private JButton chooseFileWithDataButton;
     private JButton startAlgorithmButton;
     private JCheckBox NEHCheckBox;
@@ -32,82 +34,35 @@ public class Main extends Component {
     private JRadioButton PMXRadioButton;
     private JRadioButton swapRadioButton;
     private JLabel errorLabel;
-    private String maxIterations;
-    private String populationSize;
-    private String absorbtionCoefficient;
-    private String baseAttraction;
-    private String lightAbsorption;
-    private boolean usesNEH;
-    private boolean usesCDS;
+    private SolverParameters parameters;
     private String path = "";
-    private String crossoverStrategy = "PMX";
 
     public Main() {
-        chooseFileWithDataButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Open file chooser form
-                final JFileChooser fc = new JFileChooser();
-                int returnVal = fc.showOpenDialog(Main.this);
-                if (returnVal == JFileChooser.APPROVE_OPTION) {
-                    // Assign path to a file chosen by user
-                    path = fc.getSelectedFile().getAbsolutePath();
-                }
+        initializeSolverParameters();
+
+        chooseFileWithDataButton.addActionListener(e -> {
+            // Open file chooser form
+            final JFileChooser fc = new JFileChooser();
+            int returnVal = fc.showOpenDialog(Main.this);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                // Assign path to a file chosen by user
+                path = fc.getSelectedFile().getAbsolutePath();
             }
         });
-        startAlgorithmButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Start algorithm
+        startAlgorithmButton.addActionListener(e -> {
+            // Gather data from fields
+            updateSolverParameters();
 
-                // Gather data from fields
-                getData(Main.this);
-
-                // Check if everything has been filled properly
-                if (checkData()) {
-                    startAlgorithm();
-                    errorLabel.setText("");
-                } else {
-                    errorLabel.setText("Fill the fields properly! Don't forget about file path ;)");
-                }
+            if (path.equals(""))
+                errorLabel.setText("Fill the file path");
+            else {
+                errorLabel.setText("");
+                startAlgorithm();
             }
         });
 
-        PMXRadioButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                crossoverStrategy = "PMX";
-            }
-        });
-        swapRadioButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                crossoverStrategy = "swap";
-            }
-        });
-    }
-
-    private boolean checkData() {
-        boolean result = false;
-
-        // Test if everything is filled
-        if (!maxIterations.equals("") && !populationSize.equals("") && !absorbtionCoefficient.equals("")
-                && !baseAttraction.equals("") && !lightAbsorption.equals("") && !path.equals(""))
-            result = true;
-
-        // Try converting (if anything fails (user didn't fill tv properly) return false)
-        try {
-            Long.parseLong(maxIterations);
-            Long.parseLong(populationSize);
-            Double.parseDouble(absorbtionCoefficient);
-            Double.parseDouble(baseAttraction);
-            Double.parseDouble(lightAbsorption);
-        } catch (NumberFormatException e) {
-            return false;
-        }
-
-        return result;
-
+        PMXRadioButton.addActionListener(e -> parameters.movementStrategy = MovementStrategyType.PMX);
+        swapRadioButton.addActionListener(e -> parameters.movementStrategy = MovementStrategyType.SWAP);
     }
 
     public static void main(String[] args) throws ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException {
@@ -118,116 +73,42 @@ public class Main extends Component {
                 UIManager.getSystemLookAndFeelClassName());
         JFrame frame = new JFrame("Main");
         frame.setContentPane(new Main().mainPanel);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
     }
 
-    public String getMaxIterations() {
-        return maxIterations;
-    }
-
-    public void setMaxIterations(final String maxIterations) {
-        this.maxIterations = maxIterations;
-    }
-
-    public String getPopulationSize() {
-        return populationSize;
-    }
-
-    public void setPopulationSize(final String populationSize) {
-        this.populationSize = populationSize;
-    }
-
-    public String getAbsorbtionCoefficient() {
-        return absorbtionCoefficient;
-    }
-
-    public void setAbsorbtionCoefficient(final String absorbtionCoefficient) {
-        this.absorbtionCoefficient = absorbtionCoefficient;
-    }
-
-    public String getBaseAttraction() {
-        return baseAttraction;
-    }
-
-    public void setBaseAttraction(final String baseAttraction) {
-        this.baseAttraction = baseAttraction;
-    }
-
-    public String getLightAbsorption() {
-        return lightAbsorption;
-    }
-
-    public void setLightAbsorption(final String lightAbsorption) {
-        this.lightAbsorption = lightAbsorption;
-    }
-
-    public boolean isUsesNEH() {
-        return usesNEH;
-    }
-
-    public void setUsesNEH(final boolean usesNEH) {
-        this.usesNEH = usesNEH;
-    }
-
-    public boolean isUsesCDS() {
-        return usesCDS;
-    }
-
-    public void setUsesCDS(final boolean usesCDS) {
-        this.usesCDS = usesCDS;
-    }
-
-    public void setData(Main data) {
-        maxIterationsTV.setText(data.getMaxIterations());
-        populationSizeTV.setText(data.getPopulationSize());
-        absorbtionCoefficientTV.setText(data.getAbsorbtionCoefficient());
-        baseAttractionTV.setText(data.getBaseAttraction());
-        lightAbsorptionTV.setText(data.getLightAbsorption());
-        NEHCheckBox.setSelected(data.isUsesNEH());
-        CDSCheckBox.setSelected(data.isUsesCDS());
-    }
-
-    public void getData(Main data) {
-        data.setMaxIterations(maxIterationsTV.getText());
-        data.setPopulationSize(populationSizeTV.getText());
-        data.setAbsorbtionCoefficient(absorbtionCoefficientTV.getText());
-        data.setBaseAttraction(baseAttractionTV.getText());
-        data.setLightAbsorption(lightAbsorptionTV.getText());
-        data.setUsesNEH(NEHCheckBox.isSelected());
-        data.setUsesCDS(CDSCheckBox.isSelected());
-    }
-
     public void startAlgorithm() {
-        System.out.println("Dobry.");
-        List<Job> jobs;
         StringBuilder defaultCombinationResult = new StringBuilder("DEFAULT COMBINATION\n\n");
         StringBuilder ourCombinationResult = new StringBuilder("SOLVER COMBINATION\n\n");
+        FlowshopProblem problem;
 
         try {
             InputParser parser = new InputParser(path);
             parser.parse();
 
+            problem = parser.getProblems().get(0);
             defaultCombinationResult.append("Jobs:\n");
-            jobs = parser.getJobs().get(0);
-            for (Job job: jobs)
-                defaultCombinationResult.append(job + "\n");
-            MakespanEvaluator ev = new MakespanEvaluator();
-            ev.setJobs(jobs);
-            defaultCombinationResult.append("\nThis needs time equal to: " + ev.evaluate());
+            for (int i = 0; i < problem.jobCount; i++) {
+                defaultCombinationResult.append(String.format("ID: %d ; [", i));
+                for (int j = 0; j < problem.operationCount; j++)
+                    defaultCombinationResult.append(String.format("%2d ", problem.jobs[i][j]));
+                defaultCombinationResult.append("]\n");
+            }
 
-            Solver algo = new Solver(jobs.toArray(new Job[jobs.size()]), Long.valueOf(maxIterations),
-                    Long.valueOf(populationSize),
-                    Double.valueOf(lightAbsorption), Double.valueOf(baseAttraction), crossoverStrategy, usesCDS, usesNEH);
-            Firefly result = algo.run(Long.parseLong(String.valueOf(parser.getInitialSeed())));
+            FlowshopSolution initial = new VectorFlowshopSolution(problem.jobCount);
+            for (int i = 0; i < problem.jobCount; i++) initial.set(i, i);
+
+            defaultCombinationResult.append("\nThis needs time equal to: " + problem.evaluateSolution(initial));
+
+            Solver solver = new Solver(problem, parameters);
+            FlowshopSolution solution = solver.run();
 
             ourCombinationResult.append("Jobs:\n");
-            for (Job job: result.getJobsDistribution())
-                ourCombinationResult.append(job + "\n");
+            for (int id : solution.getOrder())
+                ourCombinationResult.append(String.format("%4d%n", id));
 
-            ev.setJobs(Arrays.asList(result.getJobsDistribution()));
-            ourCombinationResult.append("\nThis needs time equal to: " + ev.evaluate());
+            ourCombinationResult.append("\nThis needs time equal to: " + problem.evaluateSolution(solution));
 
             // Run results dialog
             Results results = new Results(defaultCombinationResult.toString(), ourCombinationResult.toString());
@@ -236,6 +117,41 @@ public class Main extends Component {
             System.out.println(e.getMessage());
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void initializeSolverParameters() {
+        parameters = new SolverParameters();
+
+        maxIterationsTV.setText("200");
+        populationSizeTV.setText("20");
+        absorbtionCoefficientTV.setText("0.1");
+        baseAttractionTV.setText("0.1");
+        NEHCheckBox.setSelected(false);
+        CDSCheckBox.setSelected(false);
+    }
+    private void updateSolverParameters() {
+        parameters.maxIterations = tryIntParse(maxIterationsTV.getText(), 200);
+        parameters.populationSize = tryIntParse(populationSizeTV.getText(), 20);
+        parameters.absorptionCoefficient = tryFloatParse(absorbtionCoefficientTV.getText(), 0.1f);
+        parameters.baseAttraction = tryFloatParse(baseAttractionTV.getText(), 0.1f);
+        parameters.useNeh = NEHCheckBox.isSelected();
+        parameters.useCds = CDSCheckBox.isSelected();
+    }
+
+    private Integer tryIntParse(String text, int defaultValue) {
+        try {
+            return Integer.parseInt(text);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
+    private Float tryFloatParse(String text, float defaultValue) {
+        try {
+            return Float.parseFloat(text);
+        } catch (NumberFormatException e) {
+            return defaultValue;
         }
     }
 

@@ -13,5 +13,5 @@ public interface MovementStrategy {
      * @param params Parameters of the solver
      * @return New order of jobs for first firefly or null, if it should not move at all
      */
-    FlowshopSolution move(FlowshopSolution first, FlowshopSolution second, FlowshopProblem problem, SolverParameters params) throws IllegalAccessException, InstantiationException;
+    FlowshopSolution move(FlowshopSolution first, FlowshopSolution second, FlowshopProblem problem, SolverParameters params);
 }

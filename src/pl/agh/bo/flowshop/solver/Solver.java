@@ -1,174 +1,108 @@
 package pl.agh.bo.flowshop.solver;
 
-import pl.agh.bo.flowshop.evaluator.IEvaluator;
-import pl.agh.bo.flowshop.evaluator.MakespanEvaluator;
-import pl.agh.bo.flowshop.Firefly;
-import pl.agh.bo.flowshop.Job;
-import pl.agh.bo.flowshop.crossover.CrossoverOperator;
-import pl.agh.bo.flowshop.crossover.PmxOperator;
-import pl.agh.bo.flowshop.crossover.SwapOperator;
-import pl.agh.bo.flowshop.generator.ConstructorType;
-import pl.agh.bo.flowshop.generator.FireflyFactory;
+import pl.agh.bo.flowshop.movement.MovementStrategy;
+import pl.agh.bo.flowshop.movement.PmxStrategy;
+import pl.agh.bo.flowshop.movement.SwapMovementStrategy;
+import pl.agh.bo.flowshop.problem.FlowshopProblem;
+import pl.agh.bo.flowshop.solution.FlowshopSolution;
+import pl.agh.bo.flowshop.solution.FlowshopSolutionType;
+import pl.agh.bo.flowshop.solution.SolutionFactory;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.*;
 
-/**
- * Created by Andrzej on 2015-04-21.
- */
 public class Solver {
 
-    private long maxIterations;
-    private long populationSize;
+    private final FlowshopProblem problem;
+    private final SolverParameters parameters;
 
-    private double lightAbsorption;
-    private double baseAttraction;
+    private Map<FlowshopSolution, Long> fireflies;
+    private SolutionFactory factory;
 
-    private String crossoverOperator;
+    public Solver(FlowshopProblem problem, SolverParameters parameters) {
+        this.problem = problem;
+        this.parameters = parameters;
 
-    private boolean cds;
-    private boolean neh;
-
-    private IEvaluator evaluator;
-
-    private Map<Long, Firefly> fireflies;
-
-    private Job[] jobs;
-
-    public Solver(Job[] jobs, long maxIterations, long populationSize, double lightAbsorption,
-                  double baseAttraction, String crossoverOperator, boolean cds, boolean neh) {
-        // TODO: What about absorption coefficient?
-
-        this.jobs = jobs;
-
-        this.maxIterations = maxIterations;
-        this.populationSize = populationSize;
-
-        this.lightAbsorption = lightAbsorption;
-        this.baseAttraction = baseAttraction;
-
-        this.crossoverOperator = crossoverOperator;
-
-        this.cds = cds;
-        this.neh = neh;
-
-        this.evaluator = new MakespanEvaluator();
+        this.fireflies = new HashMap<>();
     }
 
-    public Firefly run(long initialSeed) {
-        int i = 0;
-        Firefly bestOne = null;
+    public FlowshopSolution run() {
+        FlowshopSolution bestSolution = generateInitialPopulation();
 
-        System.out.format("Generating fireflies...%n");
+        MovementStrategy strategy;
+        FlowshopSolution newSolution;
+        long result;
 
-        fireflies = generateInitialPopulation();
-
-        System.out.format("Assigning initial light intensity...%n");
-        fireflies = recalculateIntensity(fireflies);
-
-        CrossoverOperator crossOp;
-
-        if (crossoverOperator.equals("swap")) {
-            crossOp = new SwapOperator(baseAttraction, lightAbsorption);
-        } else {
-            crossOp = new PmxOperator(initialSeed, baseAttraction, lightAbsorption);
+        switch (parameters.movementStrategy) {
+            case PMX: strategy = new PmxStrategy(); break;
+            case SWAP: strategy = new SwapMovementStrategy(); break;
+            default: throw new NotImplementedException();
         }
-        Firefly[] children;
 
-        while (i++ < maxIterations) {
-            if (i % 100 == 0) System.out.format("%d of %d%n", i, maxIterations);
+        for (int i = 0; i < parameters.maxIterations; i++) {
+            for (FlowshopSolution reference : fireflies.keySet()) {
+                for (FlowshopSolution current : fireflies.keySet()) {
+                    if (reference.equals(current))
+                        continue;
+                    if (fireflies.get(current) <= fireflies.get(reference)) continue;
 
-            for (Firefly fireflyA : fireflies.values()) {
-                for (Firefly fireflyB : fireflies.values()) {
-                    if (fireflyA.equals(fireflyB)) continue;
+                    newSolution = strategy.move(current, reference, problem, parameters);
+                    current.setOrderFrom(newSolution);
+                    result = problem.evaluateSolution(current);
 
-                    // jezeli B jest gorszy niz A, przenosimy B w lepsze miejsce
-                    if (fireflyB.getLightIntensity() > fireflyA.getLightIntensity()) {
-                        children = crossOp.apply(fireflyA, fireflyB);
-                        evaluator.setJobs(Arrays.asList(children[0].getJobsDistribution()));
-                        long firstChild = evaluator.evaluate();
-                        evaluator.setJobs(Arrays.asList(children[1].getJobsDistribution()));
-                        long secondChild = evaluator.evaluate();
-
-                        if (firstChild < fireflyB.getLightIntensity() && firstChild < secondChild) {
-                            fireflyB.setJobsDistribution(children[0].getJobsDistribution());
-                            fireflyB.setLightIntensity(firstChild);
-                        } else if (secondChild < fireflyB.getLightIntensity() && secondChild < firstChild) {
-                            fireflyB.setJobsDistribution(children[1].getJobsDistribution());
-                            fireflyB.setLightIntensity(secondChild);
-                        }
+                    if (result < fireflies.get(bestSolution))
+                        bestSolution = current;
+                    else if (result == fireflies.get(bestSolution)){
+                        current.setOrderFrom(factory.spawn());
+                        result = problem.evaluateSolution(current);
                     }
+
+                    fireflies.put(current, result);
                 }
             }
-
-            // Recalculate light intensity for every firefly
-            fireflies = recalculateIntensity(fireflies);
-
-            // Find the best firefly
-            bestOne = findBest(fireflies);
-
-            if (new Random().nextDouble() < 0.1)
-                bestOne = moveRandomly(bestOne);
         }
 
-        return bestOne;
-
+        return bestSolution;
     }
 
-    private Map<Long, Firefly> generateInitialPopulation() {
-        FireflyFactory fireflyFactory = new FireflyFactory(jobs, baseAttraction, lightAbsorption);
+    /**
+     * Generates initial population, taking into account preferences about using
+     * heuristics like CDS or NEH
+     * @return Best solution generated
+     */
+    private FlowshopSolution generateInitialPopulation() {
+        this.factory = new SolutionFactory(problem, FlowshopSolutionType.VECTOR, null);
+        int totalRequired = parameters.populationSize;
 
-        Map<Long, Firefly> population = fireflyFactory.spawnRandomPopulation(populationSize);
+        FlowshopSolution best = null, current = null;
 
-        long i = population.size();
-
-        if (cds) {
-            population.put(i++, fireflyFactory.spawn(ConstructorType.CDS));
+        if (parameters.useCds) {
+            factory.setGeneratorType(SolutionFactory.GeneratorType.CDS);
+            best = generateFirefly(factory);
+            totalRequired--;
         }
 
-        if (neh) {
-            population.put(i++, fireflyFactory.spawn(ConstructorType.NEH));
+        if (parameters.useNeh) {
+            factory.setGeneratorType(SolutionFactory.GeneratorType.NEH);
+            current = generateFirefly(factory);
+            if (best == null || fireflies.get(best) > fireflies.get(current)) best = current;
+
+            totalRequired--;
         }
 
-        return population;
+        factory.setGeneratorType(SolutionFactory.GeneratorType.RANDOM);
+        while (totalRequired > 0) {
+            current = generateFirefly(factory);
+            if (best == null || fireflies.get(best) > fireflies.get(current)) best = current;
+            totalRequired--;
+        }
+
+        return best;
     }
 
-    private Firefly moveRandomly(Firefly bestOne) {
-
-        Job[] jobs = bestOne.getJobsDistribution();
-
-        Random random = new Random();
-        int i = random.nextInt(jobs.length);
-        int j = random.nextInt(jobs.length);
-
-        Job tmp = jobs[i];
-        jobs[i] = jobs[j];
-        jobs[j] = tmp;
-
-        bestOne.setJobsDistribution(jobs);
-
-        return bestOne;
-    }
-
-    private Firefly findBest(Map<Long, Firefly> fireflies) {
-        long bestIntensity = Long.MAX_VALUE;
-        Firefly result = null;
-
-        for (Firefly firefly : fireflies.values()) {
-            if (firefly.getLightIntensity() < bestIntensity) {
-                bestIntensity = firefly.getLightIntensity();
-                result = firefly;
-            }
-        }
-
-        return result;
-    }
-
-    private Map<Long, Firefly> recalculateIntensity(Map<Long, Firefly> fireflies) {
-        for (Firefly firefly : fireflies.values()) {
-            evaluator.setJobs(Arrays.asList(firefly.getJobsDistribution()));
-            firefly.setLightIntensity(evaluator.evaluate());
-        }
-
-        return fireflies;
+    private FlowshopSolution generateFirefly(SolutionFactory factory) {
+        FlowshopSolution solution = factory.spawn();
+        fireflies.put(solution, problem.evaluateSolution(solution));
+        return solution;
     }
 }

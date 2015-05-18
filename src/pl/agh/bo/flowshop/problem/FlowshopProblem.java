@@ -16,11 +16,11 @@ public class FlowshopProblem {
     private IEvaluator evaluator = new MakespanEvaluator();
 
     public long evaluateSolution(FlowshopSolution solution) {
-        int[][] jobs = new int[solution.getLength()][];
-        for (int i = 0; i < jobs.length; i++)
-            jobs[i] = jobs[solution.get(i)];
+        int[][] newJobs = new int[jobCount][];
+        for (int i = 0; i < jobCount; i++)
+            newJobs[i] = jobs[solution.get(i)];
 
-        evaluator.setJobs(jobs);
+        evaluator.setJobs(newJobs);
         return evaluator.evaluate();
     }
 }
