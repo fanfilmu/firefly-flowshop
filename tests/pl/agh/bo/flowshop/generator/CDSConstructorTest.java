@@ -3,6 +3,9 @@ package pl.agh.bo.flowshop.generator;
 import org.junit.Test;
 import pl.agh.bo.flowshop.Job;
 import pl.agh.bo.flowshop.generator.cds.CDSConstructor;
+import pl.agh.bo.flowshop.problem.FlowshopProblem;
+import pl.agh.bo.flowshop.solution.FlowshopSolution;
+import pl.agh.bo.flowshop.solution.SolutionFactory;
 
 import static org.junit.Assert.*;
 
@@ -11,16 +14,16 @@ public class CDSConstructorTest {
     @Test
     public void testApply() throws Exception {
         CDSConstructor constructor = new CDSConstructor(1, 1);
-        Job[] jobs = new Job[] {
-                new Job(0, new Integer[] { 6, 5, 4 }),
-                new Job(1, new Integer[] { 8, 1, 4 }),
-                new Job(2, new Integer[] { 3, 5, 4 }),
-                new Job(3, new Integer[] { 4, 4, 2 })
-        };
+        FlowshopProblem problem = new FlowshopProblem();
+        problem.jobCount = 4;
+        problem.operationCount = 3;
+        problem.jobs = new int[4][];
+        problem.jobs[0] = new int[] { 6, 5, 4 };
+        problem.jobs[1] = new int[] { 8, 1, 4 };
+        problem.jobs[2] = new int[] { 3, 5, 4 };
+        problem.jobs[3] = new int[] { 4, 4, 2 };
 
-        Job[] result = constructor.apply(jobs).getJobsDistribution();
-        assertArrayEquals(new int[]{2, 0, 3, 1}, new int[] {
-                result[0].getId(), result[1].getId(), result[2].getId(), result[3].getId()
-        });
+        FlowshopSolution solution = constructor.apply(problem, SolutionFactory.SolutionType.VECTOR);
+        assertArrayEquals(new int[]{2, 0, 3, 1}, solution.getOrder());
     }
 }

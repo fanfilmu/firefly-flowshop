@@ -1,10 +1,10 @@
 package pl.agh.bo.flowshop.generator.cds;
 
-import pl.agh.bo.flowshop.evaluator.IEvaluator;
-import pl.agh.bo.flowshop.evaluator.MakespanEvaluator;
-import pl.agh.bo.flowshop.Firefly;
 import pl.agh.bo.flowshop.Job;
 import pl.agh.bo.flowshop.generator.Constructor;
+import pl.agh.bo.flowshop.problem.FlowshopProblem;
+import pl.agh.bo.flowshop.solution.FlowshopSolution;
+import pl.agh.bo.flowshop.solution.SolutionFactory;
 
 import java.util.*;
 
@@ -24,129 +24,109 @@ public class CDSConstructor implements Constructor {
         this.lightAbsorption = lightAbsorption;
     }
 
-    public Firefly apply(Job[] jobs) {
-        int jobCount = jobs.length;
-        Job[] bestSolution = null;
+    public FlowshopSolution apply(FlowshopProblem problem, SolutionFactory.SolutionType type) {
+        FlowshopSolution bestSolution = null;
         long bestSolutionEvaluation = Integer.MAX_VALUE;
 
-        SurrogateProblemIterator jobSetIterator = new SurrogateProblemIterator(jobs);
-        for (List<Job> surrogateProblem : jobSetIterator) {
-            Job[] result = new Job[jobCount];
+        SurrogateProblemIterator jobSetIterator = new SurrogateProblemIterator(problem);
 
-            List<Job> sptSet = new LinkedList<Job>();
-            List<Job> lptSet = new LinkedList<Job>();
+        for (FlowshopProblem surrogateProblem : jobSetIterator) {
+            List<Integer> sptSet = new LinkedList<>();
+            List<Integer> lptSet = new LinkedList<>();
             divideSet(surrogateProblem, sptSet, lptSet);
-            sortSets(sptSet, lptSet);
-            joinSets(jobs, result, sptSet, lptSet);
+            sortSets(surrogateProblem, sptSet, lptSet);
 
-            IEvaluator evaluator = new MakespanEvaluator();
-            evaluator.setJobs(Arrays.asList(result));
+            FlowshopSolution solution = new SolutionFactory(problem, type, SolutionFactory.GeneratorType.EMPTY).spawn();
+            joinSets(solution, sptSet, lptSet);
 
-            long evaluationResult = evaluator.evaluate();
+            long evaluationResult = problem.evaluateSolution(solution);
             if (bestSolutionEvaluation > evaluationResult) {
                 bestSolutionEvaluation = evaluationResult;
-                bestSolution = result;
+                bestSolution = solution;
             }
         }
 
-        return new Firefly(bestSolution, baseAttraction, lightAbsorption);
+        return bestSolution;
     }
 
-    private void joinSets(Job[] problem, Job[] result, List<Job> sptSet, List<Job> lptSet) {
+    private void joinSets(FlowshopSolution solution, List<Integer> sptSet, List<Integer> lptSet) {
         int i = 0;
-        for (Job tempJob : sptSet) {
-            for (Job job : problem) {
-                if (job.getId() == tempJob.getId()) {
-                    result[i] = job;
-                    i++;
-                    break;
-                }
-            }
-        }
-
-        for (Job tempJob : lptSet) {
-            for (Job job : problem) {
-                if (job.getId() == tempJob.getId()) {
-                    result[i] = job;
-                    i++;
-                    break;
-                }
-            }
+        sptSet.addAll(lptSet);
+        for (int id : sptSet) {
+            solution.set(i, id);
+            i++;
         }
     }
 
-    private void sortSets(List<Job> sptSet, List<Job> lptSet) {
-        sptSet.sort(new Comparator<Job>() {
+    private void sortSets(FlowshopProblem surrogateProblem, List<Integer> sptSet, List<Integer> lptSet) {
+        sptSet.sort(new Comparator<Integer>() {
             @Override
-            public int compare(Job o1, Job o2) {
-                return o1.getOperationTimes()[0] - o2.getOperationTimes()[0];
+            public int compare(Integer o1, Integer o2) {
+                return surrogateProblem.jobs[o1][0] - surrogateProblem.jobs[o2][0];
             }
         });
 
-        lptSet.sort(new Comparator<Job>() {
+        lptSet.sort(new Comparator<Integer>() {
             @Override
-            public int compare(Job o1, Job o2) {
-                return o2.getOperationTimes()[1] - o1.getOperationTimes()[1];
+            public int compare(Integer o1, Integer o2) {
+                return surrogateProblem.jobs[o2][1] - surrogateProblem.jobs[o1][1];
             }
         });
     }
 
-    private void divideSet(List<Job> surrogateProblem, List<Job> sptSet, List<Job> lptSet) {
-        Integer[] operationTimes = null;
-
-        for (Job job : surrogateProblem) {
-            operationTimes = job.getOperationTimes();
-            if (operationTimes[0] < operationTimes[1])
-                sptSet.add(job);
+    private void divideSet(FlowshopProblem surrogateProblem, List<Integer> sptSet, List<Integer> lptSet) {
+        for (int i = 0; i < surrogateProblem.jobCount; i++) {
+            if (surrogateProblem.jobs[i][0] < surrogateProblem.jobs[i][1])
+                sptSet.add(i);
             else
-                lptSet.add(job);
+                lptSet.add(i);
         }
     }
 
-    private class SurrogateProblemIterator implements Iterator<List<Job>>, Iterable<List<Job>> {
-        private int machineCount;
-        private int jobsCount;
+    private class SurrogateProblemIterator implements Iterator<FlowshopProblem>, Iterable<FlowshopProblem> {
         private int currentProblem;
-        private Job[] originalJobs;
+        private FlowshopProblem problem;
 
-        public SurrogateProblemIterator(Job[] jobs) {
-            originalJobs = jobs;
-            jobsCount = jobs.length;
-            machineCount = jobs[0].getOperationTimes().length;
+        public SurrogateProblemIterator(FlowshopProblem problem) {
+            this.problem = problem;
             currentProblem = 1;
         }
 
         @Override
         public boolean hasNext() {
-            return currentProblem < machineCount;
+            return currentProblem < problem.operationCount;
         }
 
         @Override
-        public List<Job> next() {
-            Job[] result = new Job[jobsCount];
+        public FlowshopProblem next() {
+            FlowshopProblem surrogateProblem = new FlowshopProblem();
+            surrogateProblem.jobCount = problem.jobCount;
+            surrogateProblem.operationCount = 2;
+            surrogateProblem.jobs = new int[problem.jobCount][2];
 
             int firstOpTime;
             int secondOpTime;
 
-            for (int i = 0; i < jobsCount; i++) {
+            for (int i = 0; i < problem.jobCount; i++) {
                 firstOpTime = 0;
                 secondOpTime = 0;
-                Integer[] currentJobOperationTimes = originalJobs[i].getOperationTimes();
+                int[] currentJobOperationTimes = problem.jobs[i];
 
                 for (int j = 0; j < currentProblem; j++) {
                     firstOpTime += currentJobOperationTimes[j];
-                    secondOpTime += currentJobOperationTimes[machineCount - 1 - j];
+                    secondOpTime += currentJobOperationTimes[problem.operationCount - 1 - j];
                 }
 
-                result[i] = new Job(originalJobs[i].getId(), new Integer[] { firstOpTime, secondOpTime });
+                surrogateProblem.jobs[i][0] = firstOpTime;
+                surrogateProblem.jobs[i][1] = secondOpTime;
             }
 
             currentProblem++;
-            return  new LinkedList<Job>(Arrays.asList(result));
+            return surrogateProblem;
         }
 
         @Override
-        public Iterator<List<Job>> iterator() {
+        public Iterator<FlowshopProblem> iterator() {
             return this;
         }
     }

@@ -5,6 +5,9 @@ import pl.agh.bo.flowshop.evaluator.MakespanEvaluator;
 import pl.agh.bo.flowshop.Firefly;
 import pl.agh.bo.flowshop.Job;
 import pl.agh.bo.flowshop.generator.Constructor;
+import pl.agh.bo.flowshop.problem.FlowshopProblem;
+import pl.agh.bo.flowshop.solution.FlowshopSolution;
+import pl.agh.bo.flowshop.solution.SolutionFactory;
 
 import java.util.Arrays;
 
@@ -19,6 +22,10 @@ public class NEHConstructor implements Constructor {
     }
 
     @Override
+    public FlowshopSolution apply(FlowshopProblem problem, SolutionFactory.SolutionType type) {
+        return null;
+    }
+
     public Firefly apply(Job[] jobs) {
         Operations.quickSort(jobs, 0, jobs.length - 1);
 
@@ -58,7 +65,7 @@ public class NEHConstructor implements Constructor {
     private void minimize(Job[] jobs) {
         IEvaluator evaluator = new MakespanEvaluator();
 
-        evaluator.setJobs(Arrays.asList(jobs));
+        //evaluator.setJobs(Arrays.asList(jobs));
 
         long min = evaluator.evaluate();
         int pos = jobs.length - 1;
@@ -67,7 +74,7 @@ public class NEHConstructor implements Constructor {
 
             Operations.swap(jobs, i - 1, i);
 
-            evaluator.setJobs(Arrays.asList(jobs));
+            //evaluator.setJobs(Arrays.asList(jobs));
 
             if (min > evaluator.evaluate()) {
                 min = evaluator.evaluate();

@@ -40,8 +40,8 @@ public class FireflyFactory {
                 constructor = new CDSConstructor(baseAttraction, lightAbsorption);
                 break;
         }
-
-        return constructor.apply(jobs);
+        return null;
+        //return constructor.apply(jobs);
     }
 
     public Map<Long, Firefly> spawnRandomPopulation(long size) {
