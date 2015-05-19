@@ -2,6 +2,7 @@ package pl.agh.bo.flowshop.GUI;
 
 import java.awt.*;
 import java.text.NumberFormat;
+import java.util.Arrays;
 import javax.swing.*;
 
 import org.jfree.chart.*;
@@ -20,7 +21,7 @@ import pl.agh.bo.flowshop.Job;
  */
 public class ResultsChart extends JFrame {
 
-    private XYSeries added = new XYSeries("Results");
+    private XYSeries added = new XYSeries("Results", false);
     private XYDataset data;
     private XYPlot xyPlot;
     private final ChartPanel chartPanel;
@@ -52,7 +53,7 @@ public class ResultsChart extends JFrame {
         XYItemRenderer renderer = xyPlot.getRenderer();
         renderer.setSeriesPaint(0, Color.blue);
         NumberAxis domain = (NumberAxis) xyPlot.getDomainAxis();
-        domain.setRange(0, 1800);
+        domain.setRange(1250, 1370);
         domain.setNumberFormatOverride(NumberFormat.getNumberInstance());
         return new ChartPanel(jfreechart);
     }
