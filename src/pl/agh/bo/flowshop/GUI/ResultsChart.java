@@ -51,9 +51,6 @@ public class ResultsChart extends JFrame {
         xyPlot = (XYPlot) jfreechart.getPlot();
         XYItemRenderer renderer = xyPlot.getRenderer();
         renderer.setSeriesPaint(0, Color.blue);
-        NumberAxis domain = (NumberAxis) xyPlot.getDomainAxis();
-        domain.setRange(1250, 1370);
-        domain.setNumberFormatOverride(NumberFormat.getNumberInstance());
         return new ChartPanel(jfreechart);
     }
 

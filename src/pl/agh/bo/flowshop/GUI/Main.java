@@ -76,8 +76,6 @@ public class Main extends Component {
     }
 
     public void startAlgorithm() {
-        StringBuilder defaultCombinationResult = new StringBuilder("DEFAULT COMBINATION\n\n");
-        StringBuilder ourCombinationResult = new StringBuilder("SOLVER COMBINATION\n\n");
         FlowshopProblem problem;
 
         try {
@@ -85,19 +83,9 @@ public class Main extends Component {
             parser.parse();
 
             problem = parser.getProblems().get(0);
-            defaultCombinationResult.append("Jobs:\n");
-
-            for (int i = 0; i < problem.jobCount; i++) {
-                defaultCombinationResult.append(String.format("ID: %d ; [", i));
-                for (int j = 0; j < problem.operationCount; j++)
-                    defaultCombinationResult.append(String.format("%2d ", problem.jobs[i][j]));
-                defaultCombinationResult.append("]\n");
-            }
 
             FlowshopSolution initial = new VectorFlowshopSolution(problem.jobCount);
             for (int i = 0; i < problem.jobCount; i++) initial.set(i, i);
-
-            defaultCombinationResult.append("\nThis needs time equal to: " + problem.evaluateSolution(initial));
 
             Solver solver = new Solver(problem, parameters);
 
