@@ -6,6 +6,7 @@ import pl.agh.bo.flowshop.problem.FlowshopProblem;
 import pl.agh.bo.flowshop.solution.FlowshopSolution;
 import pl.agh.bo.flowshop.solution.VectorFlowshopSolution;
 import pl.agh.bo.flowshop.solver.Solver;
+import pl.agh.bo.flowshop.solver.SolverListener;
 import pl.agh.bo.flowshop.solver.SolverParameters;
 
 import javax.swing.*;
@@ -96,11 +97,23 @@ public class Main extends Component {
                     String.valueOf(parameters.baseAttraction), parameters.movementStrategy.toString(),
                     String.valueOf(parameters.useCds), String.valueOf(parameters.useNeh));
 
+            solver.setListener(new SolverListener() {
+                @Override
+                public void onIterationFinished(int i, long best) {
+                    resultsChart.addResult(i, best);
+                }
+
+                @Override
+                public void onSolverFinished(FlowshopSolution bestSolution, double elapsedTime) {
+                    resultsChart.showResults(bestSolution, elapsedTime);
+                }
+            });
+
             // Run the algorithm
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    solver.run(resultsChart);
+                    solver.run();
                 }
             }).start();
 

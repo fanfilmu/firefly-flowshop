@@ -19,7 +19,7 @@ public class Solver {
 
     private Map<FlowshopSolution, Long> fireflies;
     private SolutionFactory factory;
-    private ResultsChart resultsChart;
+    private SolverListener listener;
 
     public Solver(FlowshopProblem problem, SolverParameters parameters) {
         this.problem = problem;
@@ -28,9 +28,8 @@ public class Solver {
         this.fireflies = new HashMap<>();
     }
 
-    public FlowshopSolution run(ResultsChart resultsChart) {
+    public FlowshopSolution run() {
         FlowshopSolution bestSolution = generateInitialPopulation();
-        this.resultsChart = resultsChart;
 
         // Start measuring time of algorithm
         long startTime = System.nanoTime();
@@ -38,7 +37,6 @@ public class Solver {
         System.out.format("Generating fireflies...%n");
 
         MovementStrategy strategy;
-        FlowshopSolution newSolution;
         long result, currentBest = fireflies.get(bestSolution);
 
         switch (parameters.movementStrategy) {
@@ -54,8 +52,7 @@ public class Solver {
                         continue;
                     if (fireflies.get(current) <= fireflies.get(reference)) continue;
 
-                    newSolution = strategy.move(current, reference, problem, parameters);
-                    current.setOrderFrom(newSolution);
+                    strategy.move(current, reference, problem, parameters);
                     result = problem.evaluateSolution(current);
 
                     if (result < currentBest) {
@@ -71,12 +68,12 @@ public class Solver {
                 }
             }
 
-            resultsChart.addResult(i, fireflies.get(bestSolution));
+            if (listener != null) listener.onIterationFinished(i, currentBest);
         }
 
         long stopTime = System.nanoTime();
         double elapsedTime = (stopTime - startTime)/(1000000000.0);
-        resultsChart.showResults(bestSolution, elapsedTime);
+        if (listener != null) listener.onSolverFinished(bestSolution, elapsedTime);
 
         return bestSolution;
     }
@@ -120,5 +117,9 @@ public class Solver {
         FlowshopSolution solution = factory.spawn();
         fireflies.put(solution, problem.evaluateSolution(solution));
         return solution;
+    }
+
+    public void setListener(SolverListener listener) {
+        this.listener = listener;
     }
 }

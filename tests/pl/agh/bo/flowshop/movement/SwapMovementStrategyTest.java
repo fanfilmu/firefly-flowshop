@@ -24,12 +24,12 @@ public class SwapMovementStrategyTest {
         FlowshopSolution solution1 =  factory.spawn();
         FlowshopSolution solution2 =  factory.spawn();
 
-        SwapMovementStrategy strategy = new SwapMovementStrategy();
-        FlowshopSolution result = strategy.move(solution1, solution2, problem, params);
-
         System.out.println("Solution 1:");
         for (int i = 0; i < problem.jobCount; i++)
             System.out.format("%2d ", solution1.get(i));
+
+        SwapMovementStrategy strategy = new SwapMovementStrategy();
+        strategy.move(solution1, solution2, problem, params);
 
         System.out.format("%nSolution 2:%n");
         for (int i = 0; i < problem.jobCount; i++)
@@ -37,11 +37,10 @@ public class SwapMovementStrategyTest {
 
         System.out.format("%nResult:%n");
         for (int i = 0; i < problem.jobCount; i++)
-            System.out.format("%2d ", result.get(i));
+            System.out.format("%2d ", solution1.get(i));
 
-        System.out.format("%nDist 1-2: %2d; Dist res-2: %2d%n",
-                HammingDistance.calculateDistance(solution1, solution2),
-                HammingDistance.calculateDistance(result, solution2));
+        System.out.format("%nDist res-2: %2d%n",
+                HammingDistance.calculateDistance(solution1, solution2));
 
         assertTrue(true);
     }
