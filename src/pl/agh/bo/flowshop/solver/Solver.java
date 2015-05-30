@@ -39,7 +39,7 @@ public class Solver {
 
         MovementStrategy strategy;
         FlowshopSolution newSolution;
-        long result;
+        long result, currentBest = fireflies.get(bestSolution);
 
         switch (parameters.movementStrategy) {
             case PMX: strategy = new PmxStrategy(); break;
@@ -58,9 +58,11 @@ public class Solver {
                     current.setOrderFrom(newSolution);
                     result = problem.evaluateSolution(current);
 
-                    if (result < fireflies.get(bestSolution))
+                    if (result < currentBest) {
                         bestSolution = current;
-                    else if (result == fireflies.get(bestSolution)){
+                        currentBest = result;
+                    }
+                    else if (result == currentBest){
                         current.setOrderFrom(factory.spawn());
                         result = problem.evaluateSolution(current);
                     }
