@@ -8,7 +8,6 @@ import pl.agh.bo.flowshop.solution.FlowshopSolution;
 import pl.agh.bo.flowshop.solution.FlowshopSolutionType;
 import pl.agh.bo.flowshop.solution.SolutionFactory;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-import pl.agh.bo.flowshop.GUI.ResultsChart;
 
 import java.util.*;
 
@@ -29,12 +28,14 @@ public class Solver {
     }
 
     public FlowshopSolution run() {
+        System.out.format("Generating fireflies...%n");
         FlowshopSolution bestSolution = generateInitialPopulation();
 
         // Start measuring time of algorithm
         long startTime = System.nanoTime();
+        Random rand = new Random();
 
-        System.out.format("Generating fireflies...%n");
+
 
         MovementStrategy strategy;
         long result, currentBest = fireflies.get(bestSolution);
@@ -60,7 +61,7 @@ public class Solver {
                         currentBest = result;
                     }
                     else if (result == currentBest){
-                        current.setOrderFrom(factory.spawn());
+                        current.swap(rand.nextInt(problem.jobCount), rand.nextInt(problem.jobCount));
                         result = problem.evaluateSolution(current);
                     }
 
