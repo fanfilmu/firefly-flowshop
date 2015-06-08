@@ -34,7 +34,7 @@ public class SwapMovementStrategy extends AbstractMovementStrategy {
 
     private int getNumberOfSwaps(int distance, SolverParameters params)
     {
-        float swapFraction = random.nextFloat();
+        float swapFraction = Math.max(params.baseAttraction, random.nextFloat());
         return Math.max(1, Math.round(swapFraction * distance / (2 - params.absorptionCoefficient)));
     }
 

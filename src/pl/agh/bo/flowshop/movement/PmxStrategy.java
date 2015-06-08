@@ -21,7 +21,7 @@ public class PmxStrategy extends AbstractMovementStrategy {
     }
 
     private int calculateSwathSize(int currentDistance, int jobCount, SolverParameters params) {
-        int size = jobCount - currentDistance; // new firefly should be closer to the better one
+        int size = jobCount - Math.round((1 - params.baseAttraction) * currentDistance); // new firefly should be closer to the better one
         size += random.nextInt(Math.max(1, (int)(currentDistance / (2 - params.absorptionCoefficient))));
 
         return size;
